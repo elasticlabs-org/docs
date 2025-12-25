@@ -1,15 +1,62 @@
 {
   "$schema": "https://mintlify.com/docs.json",
   "theme": "mint",
-  "name": "Mint Starter Kit",
+  "name": "Elastic Studio",
+  "maths": true,
   "colors": {
-    "primary": "#16A34A",
-    "light": "#07C983",
-    "dark": "#15803D"
+    "primary": "#6366F1",
+    "light": "#818CF8",
+    "dark": "#4F46E5"
   },
   "favicon": "/favicon.svg",
   "navigation": {
     "tabs": [
+      {
+        "tab": "Whitepaper",
+        "groups": [
+          {
+            "group": "Introduction",
+            "pages": [
+              "elastic-studio/executive-summary",
+              "elastic-studio/index"
+            ]
+          },
+          {
+            "group": "Market & Strategy",
+            "pages": [
+              "elastic-studio/market-analysis"
+            ]
+          },
+          {
+            "group": "Protocol Design",
+            "pages": [
+              "elastic-studio/architecture",
+              "elastic-studio/data-flow",
+              "elastic-studio/consensus"
+            ]
+          },
+          {
+            "group": "Economic Model",
+            "pages": [
+              "elastic-studio/tokenomics"
+            ]
+          },
+          {
+            "group": "Security & Governance",
+            "pages": [
+              "elastic-studio/security-analysis",
+              "elastic-studio/governance"
+            ]
+          },
+          {
+            "group": "Technical Reference",
+            "pages": [
+              "elastic-studio/access-layer",
+              "elastic-studio/specifications"
+            ]
+          }
+        ]
+      },
       {
         "tab": "Guides",
         "groups": [

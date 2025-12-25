@@ -1,0 +1,432 @@
+---
+title: "Data Flow"
+description: "Formal specification of the data lifecycle in Elastic Studio"
+icon: "diagram-project"
+---
+
+## Abstract
+
+This document provides a formal specification of data flow through the Elastic Studio protocol. We define nine distinct phases that transform raw, unlabeled data into verified, indexed datasets suitable for AI agent consumption. Each phase is characterized by state transitions, invariants, and performance guarantees.
+
+---
+
+## 1. Introduction
+
+The data labeling pipeline represents the core value creation mechanism of Elastic Studio. Unlike traditional centralized labeling services where quality depends on employment relationships and manual QA, Elastic Studio implements a cryptoeconomically secured pipeline where quality emerges from properly aligned incentives.
+
+**Key Design Principles:**
+
+1. **Atomicity**: Each data unit progresses through the pipeline as an atomic task
+2. **Determinism**: State transitions follow deterministic rules given inputs
+3. **Verifiability**: All transitions are auditable on-chain
+4. **Finality**: Once finalized, labels are immutable
+5. **Proportional Reward**: Contributors are compensated proportional to value added
+
+The pipeline transforms the fundamental question from "how do we ensure labelers do good work?" to "how do we make good work the economically dominant strategy?"
+
+---
+
+## 2. Lifecycle Model
+
+### 2.1 Phase Definitions
+
+The data lifecycle consists of nine sequential phases:
+
+| Phase | Name         | Input            | Output             | Duration     |
+| ----- | ------------ | ---------------- | ------------------ | ------------ |
+| 1     | Ingestion    | Raw dataset      | Validated data     | Minutes      |
+| 2     | Chunking     | Validated data   | Atomic tasks       | Minutes      |
+| 3     | Distribution | Task queue       | Assigned tasks     | Hours        |
+| 4     | Labeling     | Assigned task    | Label submissions  | Hours        |
+| 5     | Consensus    | Submissions      | Finalized label    | Seconds      |
+| 6     | Reward       | Consensus result | Token distribution | Seconds      |
+| 7     | Indexing     | Finalized label  | Searchable vector  | Minutes      |
+| 8     | Access       | Query            | Response           | Milliseconds |
+| 9     | Royalty      | Access event     | Royalty accrual    | Daily        |
+
+### 2.2 State Invariants
+
+We define critical invariants that must hold throughout the lifecycle:
+
+**Invariant 1 (Conservation of Stake):** The total staked tokens equals the sum of all individual stakes plus slashed amounts.
+
+**Invariant 2 (Task Completeness):** Every task in state "finalized" has exactly N label submissions where N is the required labeler count.
+
+**Invariant 3 (Consensus Consistency):** The finalized label is derivable from the submitted labels using the consensus algorithm.
+
+**Invariant 4 (Reward Boundedness):** Total distributed rewards never exceed the task's reward pool.
+
+---
+
+## 3. Phase Analysis
+
+### 3.1 Phase 1: Data Ingestion
+
+Data providers submit datasets to the protocol. This phase establishes the labeling requirements and economic parameters.
+
+**Formal Definition:**
+
+Let D represent a dataset submission with parameters:
+
+- **n**: dataset identifier
+- **τ**: data type (text, image, audio, video)
+- **Σ**: labeling schema defining valid label space
+- **r**: reward per task in ELASTIC tokens
+- **N**: required labelers per task
+- **θ**: consensus threshold
+
+The ingestion function validates and registers the dataset:
+
+$$
+\text{Ingest}(D) \rightarrow \begin{cases}
+(\text{dataset\_id}, \text{escrow\_tx}) & \text{if valid} \\
+\text{reject}(\text{reason}) & \text{otherwise}
+\end{cases}
+$$
+
+**Validation Criteria:**
+
+The validation predicate V(D) returns true iff:
+
+1. Format matches declared type τ
+2. Schema Σ is well-formed
+3. Reward r exceeds minimum threshold
+4. Provider has sufficient token balance
+
+Upon successful validation, tokens are transferred to escrow:
+
+$$
+\text{Escrow}(D) = r \times |\text{chunks}(D)| \times (1 + \phi_{\text{buffer}})
+$$
+
+where φ_buffer = 0.10 accounts for potential escalations requiring additional labelers.
+
+### 3.2 Phase 2: Chunking
+
+Large datasets are partitioned into atomic labeling tasks. The chunking strategy varies by data type:
+
+**Text Chunking:**
+
+Text is segmented at sentence boundaries using linguistic parsing. The target chunk size balances context sufficiency against labeler cognitive load:
+
+$$
+\text{optimal\_size} = \arg\min_s \left[ \alpha \cdot \text{context\_loss}(s) + \beta \cdot \text{cognitive\_load}(s) \right]
+$$
+
+Empirically, optimal text chunks contain 1-5 sentences for classification tasks and single sentences for NER tasks.
+
+**Image Chunking:**
+
+Images are processed individually. For very large images, we apply tiling with overlap:
+
+$$
+\text{tiles} = \left\lceil \frac{W}{w - o} \right\rceil \times \left\lceil \frac{H}{h - o} \right\rceil
+$$
+
+where (W, H) are image dimensions, (w, h) are tile dimensions, and o is overlap.
+
+**Audio/Video Chunking:**
+
+Temporal media is segmented using activity detection. For audio:
+
+$$
+\text{segments} = \text{VAD}(\text{audio}) \cup \text{FixedWindow}(\text{silence}, T_{\max})
+$$
+
+where VAD is voice activity detection and T_max is the maximum segment duration.
+
+### 3.3 Phase 3: Task Distribution
+
+Task assignment determines which labelers work on which tasks. The mechanism must balance quality optimization against gaming resistance.
+
+**Problem Formulation:**
+
+Given task T and eligible labeler set L, select N labelers to maximize expected quality Q while minimizing correlation:
+
+$$
+\max_{S \subseteq L, |S|=N} \mathbb{E}[Q(S)] - \lambda \cdot \text{Corr}(S)
+$$
+
+The correlation penalty prevents colluding labelers from being assigned together.
+
+**Eligibility Function:**
+
+Labeler i is eligible for task T iff:
+
+$$
+\text{Eligible}(i, T) = \begin{cases}
+\text{true} & \text{if } S_i \geq S_{\min}(T) \land R_i \geq R_{\min}(T) \land \neg\text{Assigned}(i, D_T) \\
+\text{false} & \text{otherwise}
+\end{cases}
+$$
+
+**Selection Algorithm:**
+
+1. Compute eligibility scores for all labelers
+2. Form candidate pool from top percentile
+3. Sample N labelers uniformly from pool
+
+The uniform sampling in step 3 is critical: deterministic selection enables gaming where labelers could predict assignments.
+
+### 3.4 Phase 4: Labeling
+
+Assigned labelers submit labels within the validity window. The protocol captures both explicit labels and implicit quality signals.
+
+**Submission Structure:**
+
+Each submission s contains:
+
+- Label value conforming to schema Σ
+- Self-reported confidence c in [0, 1]
+- Automatic metadata (time spent, revision count)
+
+**Validity Window:**
+
+Submissions must occur within the assignment window:
+
+$$
+\text{Valid}(s) = t_{\text{submit}} \in [t_{\text{assign}}, t_{\text{assign}} + T_{\text{window}}]
+$$
+
+Late submissions are rejected, and the labeler's assignment expires.
+
+**Quality Signal Extraction:**
+
+The system extracts implicit quality indicators:
+
+| Signal                            | Interpretation            |
+| --------------------------------- | ------------------------- |
+| Time below threshold              | Potential random guessing |
+| Time above threshold              | Careful consideration     |
+| High revision count               | Thoughtful deliberation   |
+| Consistent confidence calibration | Reliable self-assessment  |
+
+### 3.5 Phase 5: Consensus
+
+Upon receiving all N submissions, the consensus algorithm determines the finalized label.
+
+**Weighted Aggregation:**
+
+Each labeler's vote is weighted by reputation:
+
+$$
+w_i = \frac{R_i}{\sum_{j=1}^{N} R_j}
+$$
+
+**Label Aggregation:**
+
+For categorical labels, compute weighted vote share:
+
+$$
+W(l) = \sum_{i: L_i = l} w_i
+$$
+
+The consensus label is:
+
+$$
+\hat{L} = \arg\max_l W(l)
+$$
+
+**Consensus Criteria:**
+
+Consensus is reached iff the winning label exceeds threshold:
+
+$$
+\text{ConsensusReached} \Leftrightarrow W(\hat{L}) \geq \theta
+$$
+
+**Escalation Protocol:**
+
+When consensus is not reached:
+
+| Condition          | Action                                   |
+| ------------------ | ---------------------------------------- |
+| W(L̂) ≥ 0.5         | Assign additional labelers, re-aggregate |
+| W(L̂) less than 0.5 | Escalate to expert review panel          |
+
+### 3.6 Phase 6: Reward Distribution
+
+Rewards are distributed immediately upon consensus finalization.
+
+**Base Reward:**
+
+The per-labeler base reward from pool P:
+
+$$
+r_{\text{base}} = \frac{P \cdot (1 - \phi)}{N}
+$$
+
+where φ = 0.05 is the protocol fee.
+
+**Adjusted Reward:**
+
+Individual rewards are adjusted by multipliers:
+
+$$
+r_i = r_{\text{base}} \cdot m_R(R_i) \cdot m_S(S_i) \cdot m_A(a_i)
+$$
+
+where:
+
+- m_R: reputation multiplier (1.0 to 1.5)
+- m_S: stake multiplier (1.0 to 2.0)
+- m_A: agreement multiplier (0.5 to 1.2)
+
+**Agreement Calculation:**
+
+The agreement factor measures alignment with consensus:
+
+$$
+a_i = \begin{cases}
+1.0 & \text{if } L_i = \hat{L} \\
+0.5 & \text{if } L_i \neq \hat{L} \text{ but within threshold} \\
+0.0 & \text{if } L_i \text{ flagged as adversarial}
+\end{cases}
+$$
+
+### 3.7 Phase 7: Indexing
+
+Finalized labels are embedded and indexed for semantic retrieval.
+
+**Embedding Generation:**
+
+Data is transformed to vector representation:
+
+$$
+v = \text{Embed}_\tau(x, l)
+$$
+
+where Embed_τ is the type-specific embedding model.
+
+**Index Structure:**
+
+The vector index supports:
+
+- Approximate nearest neighbor search
+- Metadata filtering
+- Hybrid dense-sparse retrieval
+
+**Index Entry:**
+
+Each indexed record contains:
+
+- Vector embedding v
+- Original data reference
+- Finalized label
+- Consensus confidence
+- Contributing labeler count
+- Timestamp
+
+### 3.8 Phase 8: Data Access
+
+External consumers query the indexed data through the access layer.
+
+**Access Methods:**
+
+| Method        | Protocol  | Latency | Use Case            |
+| ------------- | --------- | ------- | ------------------- |
+| REST API      | HTTPS     | ~100ms  | Programmatic access |
+| MCP Server    | stdio/SSE | ~50ms   | LLM integration     |
+| Vector Search | HTTPS     | ~50ms   | Semantic retrieval  |
+
+**Access Control:**
+
+Requests are validated against:
+
+1. Authentication (valid API key)
+2. Authorization (appropriate scopes)
+3. Rate limits (per-plan quotas)
+4. Balance (sufficient ELASTIC)
+
+### 3.9 Phase 9: Royalty Distribution
+
+Data access triggers royalty payments to contributing labelers.
+
+**Royalty Calculation:**
+
+For access to task T with fee F:
+
+$$
+\rho_i = F \cdot (1 - \phi_{\text{protocol}}) \cdot \frac{w_i}{\sum_j w_j}
+$$
+
+where:
+
+- φ_protocol = 0.20 (20% protocol fee)
+- w_i = contribution weight of labeler i
+
+**Distribution Mechanics:**
+
+Royalties are aggregated and distributed daily:
+
+1. Access events logged with fees
+2. Daily aggregation by labeler
+3. Threshold check (minimum 1 ELASTIC)
+4. Batch transfer to labeler wallets
+
+This creates sustainable passive income for high-quality labelers, incentivizing long-term protocol participation.
+
+---
+
+## 4. Formal Properties
+
+### 4.1 Liveness
+
+**Theorem (Progress):** Every submitted task eventually reaches the finalized state.
+
+_Proof sketch:_ Tasks have bounded timeouts at each state. Timeout triggers either re-assignment (preserving progress) or escalation to review panel. Review panel decisions are guaranteed within 7 days. Therefore, all paths lead to finalization within bounded time.
+
+### 4.2 Safety
+
+**Theorem (Consensus Integrity):** The finalized label accurately represents the weighted majority opinion of labelers.
+
+_Proof sketch:_ The consensus algorithm is deterministic given inputs. Labeler weights are derived from on-chain reputation scores. The threshold parameter θ bounds the confidence level. Any deviation would require either modifying on-chain state or corrupting the aggregation computation, both detectable.
+
+### 4.3 Economic Security
+
+**Theorem (Honest Majority Sufficiency):** If honest labelers control more than 50% of reputation-weighted stake, the protocol produces correct labels.
+
+_Proof sketch:_ In weighted voting, honest majority implies honest votes outweigh malicious votes. The threshold θ ≥ 0.5 ensures majority agreement is required. Therefore, consensus converges to the honest label.
+
+---
+
+## 5. Performance Requirements
+
+### 5.1 Latency Targets
+
+| Metric                  | Target   | P99       |
+| ----------------------- | -------- | --------- |
+| Upload to task creation | 1 minute | 5 minutes |
+| Task assignment         | 1 hour   | 4 hours   |
+| Full labeling cycle     | 48 hours | 72 hours  |
+| Consensus computation   | 1 second | 5 seconds |
+| Query response          | 100ms    | 500ms     |
+
+### 5.2 Throughput Targets
+
+| Operation        | Sustained  | Burst      |
+| ---------------- | ---------- | ---------- |
+| Task creation    | 1,000/sec  | 10,000/sec |
+| Label submission | 500/sec    | 2,000/sec  |
+| API queries      | 10,000/sec | 50,000/sec |
+
+### 5.3 Availability
+
+| Component        | Target | RTO   | RPO   |
+| ---------------- | ------ | ----- | ----- |
+| API Gateway      | 99.95% | 5 min | 0     |
+| Consensus Engine | 99.99% | 1 min | 0     |
+| Vector Index     | 99.95% | 5 min | 1 min |
+
+---
+
+## 6. Conclusion
+
+The data flow specification defines a complete pipeline for transforming raw data into verified, AI-ready datasets. The nine-phase model ensures:
+
+1. **Data integrity** through validation and immutable finalization
+2. **Quality assurance** through reputation-weighted consensus
+3. **Economic alignment** through proportional rewards and royalties
+4. **Accessibility** through multiple query interfaces
+
+The formal properties guarantee that the protocol produces correct outputs under honest majority assumptions, with bounded latency and high availability.

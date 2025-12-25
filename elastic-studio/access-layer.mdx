@@ -1,0 +1,472 @@
+---
+title: "Access Layer"
+description: "Data access interfaces for AI agents and developers"
+icon: "plug"
+---
+
+The Access Layer provides multiple interfaces for consuming verified datasets from Elastic Studio. This document specifies the available integration methods, authentication, and usage patterns.
+
+## Integration Methods
+
+<CardGroup cols={3}>
+  <Card title="REST API" icon="server">
+    Standard HTTP API for programmatic access. Suitable for backend services and
+    batch processing.
+  </Card>
+
+  <Card title="MCP Server" icon="robot">
+    Model Context Protocol for native AI agent integration. Optimized for LLM
+    context retrieval.
+  </Card>
+
+  <Card title="Vector Search" icon="magnifying-glass">
+    Semantic similarity search for RAG applications and embedding-based
+    retrieval.
+  </Card>
+</CardGroup>
+
+---
+
+## Authentication
+
+### API Key Specification
+
+All access requires authentication via API keys:
+
+| Property   | Specification                     |
+| ---------- | --------------------------------- |
+| Format     | `es_live_[32 alphanumeric chars]` |
+| Header     | `Authorization: Bearer {api_key}` |
+| Rotation   | Manual via dashboard              |
+| Revocation | Immediate effect                  |
+
+### Permission Scopes
+
+| Scope            | Description               | Endpoints                    |
+| ---------------- | ------------------------- | ---------------------------- |
+| `datasets:read`  | View datasets and records | GET /datasets/\*             |
+| `datasets:write` | Create/manage datasets    | POST/PUT/DELETE /datasets/\* |
+| `search:read`    | Execute search queries    | POST /search, /vectors/\*    |
+| `export:read`    | Bulk data export          | POST /export                 |
+| `billing:read`   | Usage and balance         | GET /billing/\*              |
+
+### Balance Requirements
+
+Data access charges ELASTIC tokens from the account balance:
+
+| Operation        | Cost                  |
+| ---------------- | --------------------- |
+| API query        | 0.001 ELASTIC/request |
+| Record retrieval | 0.0001 ELASTIC/record |
+| Vector search    | 0.005 ELASTIC/query   |
+| Bulk export      | 0.0001 ELASTIC/record |
+
+<Warning>
+  Minimum account balance: **100 ELASTIC**. Operations fail with
+  `INSUFFICIENT_BALANCE` below this threshold.
+</Warning>
+
+---
+
+## REST API Specification
+
+### Base Configuration
+
+| Property | Value                             |
+| -------- | --------------------------------- |
+| Base URL | `https://api.elasticstudio.io/v1` |
+| Protocol | HTTPS (TLS 1.3)                   |
+| Format   | JSON                              |
+| Encoding | UTF-8                             |
+
+### Response Format
+
+**Success response:**
+
+| Field        | Type         | Description             |
+| ------------ | ------------ | ----------------------- |
+| `data`       | object/array | Response payload        |
+| `pagination` | object       | Cursor-based pagination |
+| `usage`      | object       | Tokens charged, balance |
+
+**Error response:**
+
+| Field           | Type   | Description                |
+| --------------- | ------ | -------------------------- |
+| `error.code`    | string | Error identifier           |
+| `error.message` | string | Human-readable description |
+| `error.details` | object | Additional context         |
+| `request_id`    | string | Support reference          |
+
+### Error Codes
+
+| Code                   | HTTP Status | Description              |
+| ---------------------- | ----------- | ------------------------ |
+| `UNAUTHORIZED`         | 401         | Invalid/missing API key  |
+| `FORBIDDEN`            | 403         | Insufficient permissions |
+| `NOT_FOUND`            | 404         | Resource not found       |
+| `INVALID_REQUEST`      | 400         | Malformed parameters     |
+| `RATE_LIMITED`         | 429         | Quota exceeded           |
+| `INSUFFICIENT_BALANCE` | 402         | Low ELASTIC balance      |
+| `INTERNAL_ERROR`       | 500         | Server error             |
+
+### Endpoints
+
+<Tabs>
+  <Tab title="List Datasets">
+    **Endpoint**: `GET /datasets` **Query Parameters**: | Parameter | Type |
+    Default | Description | |-----------|------|---------|-------------| |
+    `data_type` | enum | — | Filter: text, image, audio, video | | `label_type`
+    | string | — | Filter by label schema type | | `min_confidence` | float |
+    0.0 | Minimum consensus confidence | | `min_records` | integer | 0 | Minimum
+    record count | | `limit` | integer | 20 | Results per page (max 100) | |
+    `cursor` | string | — | Pagination cursor | **Response** (200 OK): | Field |
+    Type | Description | |-------|------|-------------| | `data[].id` | string |
+    Dataset identifier | | `data[].name` | string | Dataset name | |
+    `data[].data_type` | enum | Data type | | `data[].total_records` | integer |
+    Record count | | `data[].avg_confidence` | float | Mean confidence | |
+    `data[].created_at` | timestamp | Creation time |
+  </Tab>
+
+  <Tab title="Get Records">
+    **Endpoint**: `GET /datasets/{dataset_id}/records` **Path Parameters**: |
+    Parameter | Type | Description | |-----------|------|-------------| |
+    `dataset_id` | string | Dataset identifier | **Query Parameters**: |
+    Parameter | Type | Default | Description |
+    |-----------|------|---------|-------------| | `label` | string | — | Filter
+    by label value | | `min_confidence` | float | 0.0 | Confidence threshold | |
+    `include_metadata` | boolean | false | Include labeling metadata | | `limit`
+    | integer | 100 | Records per page (max 1000) | | `cursor` | string | — |
+    Pagination cursor | **Response** (200 OK): | Field | Type | Description |
+    |-------|------|-------------| | `data[].id` | string | Record identifier |
+    | `data[].content` | varies | Raw data content | | `data[].label` | object |
+    Finalized label | | `data[].label.value` | varies | Label value | |
+    `data[].label.confidence` | float | Consensus confidence | |
+    `data[].metadata` | object | Optional labeling metadata |
+  </Tab>
+
+  <Tab title="Semantic Search">
+    **Endpoint**: `POST /search` **Request Body**: | Field | Type | Required |
+    Description | |-------|------|----------|-------------| | `query` | string |
+    Yes | Natural language query | | `data_types` | array | No | Filter by data
+    types | | `filters` | object | No | Additional filters | |
+    `filters.label_type` | string | No | Label schema type | |
+    `filters.min_confidence` | float | No | Confidence threshold | |
+    `filters.dataset_ids` | array | No | Limit to datasets | | `top_k` | integer
+    | No | Results count (default: 10, max: 100) | **Response** (200 OK): |
+    Field | Type | Description | |-------|------|-------------| | `results[].id`
+    | string | Record identifier | | `results[].score` | float | Relevance score
+    [0, 1] | | `results[].content` | varies | Data content | | `results[].label`
+    | object | Label information | | `results[].dataset_id` | string | Source
+    dataset |
+  </Tab>
+
+  <Tab title="Bulk Export">
+    **Endpoint**: `POST /datasets/{dataset_id}/export` **Request Body**: | Field
+    | Type | Required | Description | |-------|------|----------|-------------|
+    | `format` | enum | Yes | json, jsonl, csv, parquet, huggingface | |
+    `include_splits` | boolean | No | Create train/val/test splits | |
+    `split_ratios` | object | No | Custom split ratios | | `filters` | object |
+    No | Record filters | | `webhook_url` | string | No | Completion
+    notification URL | **Response** (202 Accepted): | Field | Type | Description
+    | |-------|------|-------------| | `export_id` | string | Export job
+    identifier | | `status` | string | "processing" | | `estimated_seconds` |
+    integer | Completion estimate | **Webhook payload** (on completion): | Field
+    | Type | Description | |-------|------|-------------| | `export_id` | string
+    | Export job identifier | | `status` | string | "completed" or "failed" | |
+    `download_url` | string | Signed URL (24h expiry) | | `record_count` |
+    integer | Records exported |
+  </Tab>
+</Tabs>
+
+---
+
+## MCP Server Specification
+
+### Protocol
+
+| Property  | Value                        |
+| --------- | ---------------------------- |
+| Protocol  | Model Context Protocol (MCP) |
+| Transport | stdio, SSE                   |
+| Version   | 1.0                          |
+
+### Configuration
+
+**Environment variables**:
+
+| Variable                  | Required | Description                |
+| ------------------------- | -------- | -------------------------- |
+| `ELASTIC_STUDIO_API_KEY`  | Yes      | API key for authentication |
+| `ELASTIC_STUDIO_BASE_URL` | No       | Custom API endpoint        |
+| `ELASTIC_STUDIO_TIMEOUT`  | No       | Request timeout (ms)       |
+
+**Client configuration** (example):
+
+```json
+{
+  "mcpServers": {
+    "elastic-studio": {
+      "command": "npx",
+      "args": ["@elastic-studio/mcp-server"],
+      "env": {
+        "ELASTIC_STUDIO_API_KEY": "es_live_xxxx"
+      }
+    }
+  }
+}
+```
+
+### Available Tools
+
+<AccordionGroup>
+  <Accordion title="search_datasets" icon="magnifying-glass">
+    Search for labeled data across all datasets. **Parameters**: | Name | Type |
+    Required | Description | |------|------|----------|-------------| | `query`
+    | string | Yes | Natural language search query | | `data_type` | enum | No |
+    Filter: text, image, audio, video | | `label_type` | string | No | Filter by
+    label schema | | `limit` | integer | No | Results to return (default: 10) |
+    **Returns**: Array of matching records with scores.
+  </Accordion>
+
+  <Accordion title="get_dataset_info" icon="info">
+    Retrieve metadata about a specific dataset. **Parameters**: | Name | Type |
+    Required | Description | |------|------|----------|-------------| |
+    `dataset_id` | string | Yes | Dataset identifier | **Returns**: Dataset
+    metadata including schema, statistics, sample records.
+  </Accordion>
+
+  <Accordion title="get_labeled_examples" icon="tags">
+    Retrieve specific labeled examples for few-shot prompting. **Parameters**: |
+    Name | Type | Required | Description |
+    |------|------|----------|-------------| | `dataset_id` | string | Yes |
+    Dataset identifier | | `label` | string | No | Filter by label value | |
+    `count` | integer | No | Number of examples (default: 5) | **Returns**:
+    Array of example records.
+  </Accordion>
+
+  <Accordion title="analyze_label_distribution" icon="chart-pie">
+    Get label distribution statistics. **Parameters**: | Name | Type | Required
+    | Description | |------|------|----------|-------------| | `dataset_id` |
+    string | Yes | Dataset identifier | **Returns**: Label counts, percentages,
+    confidence distributions.
+  </Accordion>
+</AccordionGroup>
+
+### Resource URIs
+
+MCP resources provide direct access to datasets:
+
+| URI Pattern                             | Description                 |
+| --------------------------------------- | --------------------------- |
+| `elastic-studio://datasets`             | List all available datasets |
+| `elastic-studio://datasets/{id}`        | Specific dataset metadata   |
+| `elastic-studio://datasets/{id}/schema` | Labeling schema             |
+| `elastic-studio://search?query={q}`     | Search results              |
+
+---
+
+## Vector Search Specification
+
+### Endpoint
+
+`POST /v1/vectors/search`
+
+### Query Types
+
+<Tabs>
+  <Tab title="Vector Query">
+    Query using a pre-computed embedding vector.
+    
+    **Request**:
+    
+    | Field | Type | Required | Description |
+    |-------|------|----------|-------------|
+    | `vector` | float[] | Yes | Query embedding |
+    | `top_k` | integer | No | Results count (default: 10) |
+    | `filters` | object | No | Metadata filters |
+    | `include_vectors` | boolean | No | Return result vectors |
+    
+    **Vector requirements**:
+    - Dimensions must match index (768–4096)
+    - L2 normalized recommended
+  </Tab>
+  
+  <Tab title="Text Query">
+    Query using natural language (auto-embedded).
+    
+    **Request**:
+    
+    | Field | Type | Required | Description |
+    |-------|------|----------|-------------|
+    | `text` | string | Yes | Query text |
+    | `embedding_model` | string | No | Model selection |
+    | `top_k` | integer | No | Results count |
+    | `filters` | object | No | Metadata filters |
+    
+    **Available models**:
+    
+    | Model | Dimensions | Best for |
+    |-------|------------|----------|
+    | `text-embedding-3-large` | 3072 | General text |
+    | `text-embedding-3-small` | 1536 | Cost-effective |
+    | `bge-large-en-v1.5` | 1024 | Open-source |
+  </Tab>
+  
+  <Tab title="Hybrid Query">
+    Combined vector and keyword search.
+    
+    **Request**:
+    
+    | Field | Type | Required | Description |
+    |-------|------|----------|-------------|
+    | `text` | string | Yes | Query text |
+    | `keywords` | string[] | No | Required keywords |
+    | `vector_weight` | float | No | Vector vs keyword balance (0-1) |
+    | `top_k` | integer | No | Results count |
+    
+    **Scoring**:
+    
+    $$
+    \text{score} = w \cdot \text{vector\_score} + (1-w) \cdot \text{keyword\_score}
+    $$
+    
+    Default: \(w = 0.7\)
+  </Tab>
+</Tabs>
+
+### Filter Specification
+
+Metadata filters support the following operators:
+
+| Operator | Example                          | Description      |
+| -------- | -------------------------------- | ---------------- |
+| `$eq`    | `{"label": {"$eq": "positive"}}` | Exact match      |
+| `$ne`    | `{"label": {"$ne": "spam"}}`     | Not equal        |
+| `$gt`    | `{"confidence": {"$gt": 0.9}}`   | Greater than     |
+| `$gte`   | `{"confidence": {"$gte": 0.8}}`  | Greater or equal |
+| `$lt`    | `{"confidence": {"$lt": 0.5}}`   | Less than        |
+| `$lte`   | `{"confidence": {"$lte": 0.3}}`  | Less or equal    |
+| `$in`    | `{"label": {"$in": ["a", "b"]}}` | In array         |
+| `$nin`   | `{"label": {"$nin": ["spam"]}}`  | Not in array     |
+
+**Filterable fields**:
+
+- `dataset_id` (string)
+- `data_type` (enum)
+- `label_type` (string)
+- `label` (varies)
+- `confidence` (float)
+- `created_at` (timestamp)
+
+### Response Format
+
+| Field                | Type    | Description              |
+| -------------------- | ------- | ------------------------ |
+| `results`            | array   | Matched records          |
+| `results[].id`       | string  | Record identifier        |
+| `results[].score`    | float   | Similarity score [0, 1]  |
+| `results[].content`  | varies  | Data content             |
+| `results[].metadata` | object  | Record metadata          |
+| `results[].vector`   | float[] | Embedding (if requested) |
+
+---
+
+## Rate Limits
+
+### Quota Specification
+
+| Plan           | Requests/min | Records/day | Vector queries/min | Concurrent |
+| -------------- | ------------ | ----------- | ------------------ | ---------- |
+| **Free**       | 10           | 1,000       | 5                  | 2          |
+| **Starter**    | 100          | 50,000      | 50                 | 10         |
+| **Pro**        | 1,000        | 500,000     | 500                | 50         |
+| **Enterprise** | Custom       | Custom      | Custom             | Custom     |
+
+### Rate Limit Headers
+
+| Header                  | Description                  |
+| ----------------------- | ---------------------------- |
+| `X-RateLimit-Limit`     | Maximum requests per window  |
+| `X-RateLimit-Remaining` | Remaining requests           |
+| `X-RateLimit-Reset`     | Unix timestamp of reset      |
+| `Retry-After`           | Seconds until retry (on 429) |
+
+### Backoff Strategy
+
+On rate limit (429), implement exponential backoff:
+
+$$
+\text{delay} = \min(2^n \cdot 100\text{ms}, 30\text{s}) + \text{jitter}
+$$
+
+Where \(n\) is the retry attempt number.
+
+---
+
+## Webhook Specification
+
+### Event Types
+
+| Event              | Trigger                 | Payload                    |
+| ------------------ | ----------------------- | -------------------------- |
+| `dataset.updated`  | New records added       | dataset_id, new_count      |
+| `export.completed` | Export ready            | export_id, download_url    |
+| `usage.threshold`  | Usage approaching limit | current, limit, percentage |
+
+### Webhook Security
+
+Webhooks are signed using HMAC-SHA256:
+
+| Header                | Description          |
+| --------------------- | -------------------- |
+| `X-Elastic-Signature` | `sha256={signature}` |
+| `X-Elastic-Timestamp` | Unix timestamp       |
+
+**Verification**:
+
+1. Concatenate `timestamp.payload`
+2. Compute HMAC-SHA256 with webhook secret
+3. Compare with signature header
+4. Reject if timestamp > 5 minutes old
+
+---
+
+## SDK Availability
+
+| Language   | Package                            | Status    |
+| ---------- | ---------------------------------- | --------- |
+| Python     | `elastic-studio`                   | Available |
+| TypeScript | `@elastic-studio/sdk`              | Available |
+| Go         | `github.com/elastic-studio/go-sdk` | Beta      |
+| Rust       | `elastic-studio`                   | Planned   |
+
+### SDK Features
+
+- Automatic retry with backoff
+- Connection pooling
+- Streaming for large exports
+- Type-safe responses
+- Async/await support
+
+---
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card
+    title="Technical Specifications"
+    icon="code"
+    href="/elastic-studio/specifications"
+  >
+    Detailed schemas and contracts
+  </Card>
+
+  <Card
+    title="Data Flow"
+    icon="diagram-project"
+    href="/elastic-studio/data-flow"
+  >
+    End-to-end lifecycle
+  </Card>
+</CardGroup>

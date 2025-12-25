@@ -1,0 +1,240 @@
+---
+title: "Executive Summary"
+description: "Investment thesis and strategic overview for Elastic Studio"
+icon: "file-lines"
+---
+
+## Vision Statement
+
+Elastic Studio is building the **decentralized infrastructure layer for AI training data** — a protocol that transforms data labeling from a cost center into a transparent, incentive-aligned marketplace where quality is cryptographically guaranteed.
+
+**The Core Thesis:** As AI systems become more capable, the quality of training data becomes the primary bottleneck. Elastic Studio creates economic alignment between data quality and participant rewards, enabling AI-ready datasets at unprecedented scale and reliability.
+
+---
+
+## 1. Market Opportunity
+
+### 1.1 The Data Labeling Crisis
+
+The global AI industry faces a fundamental scaling challenge: the demand for high-quality labeled data far outpaces supply.
+
+| Metric | 2024 | 2028 (Projected) | CAGR |
+|--------|------|------------------|------|
+| Global data labeling market | 2.1B USD | 8.7B USD | 42.5% |
+| Enterprise AI data spend | 45B USD | 180B USD | 41.2% |
+| Labeled data volume required | 2.3 EB | 18.5 EB | 68.4% |
+
+*Sources: Gartner, IDC, Grand View Research*
+
+### 1.2 Why Current Solutions Are Failing
+
+**Centralized Platforms (Scale AI, Labelbox):**
+Premium pricing (0.10-5.00 USD per label) with opaque quality processes. No accountability for labeler performance. Black-box operations prevent verification.
+
+**Crowdsourcing (Amazon MTurk, Clickworker):**
+Inconsistent quality—often under 70% accuracy. Race-to-bottom economics incentivize speed over accuracy. No reputation persistence.
+
+**In-house Teams:**
+Expensive at 50-100K USD per annotator annually. Doesn't scale. Companies cannot build expertise across all required domains.
+
+**Synthetic Data:**
+AI-generated labels inherit model biases and hallucinations. Cannot produce genuinely novel ground truth. Unsuitable for evaluation datasets.
+
+---
+
+## 2. The Elastic Studio Solution
+
+We introduce a cryptoeconomic protocol that fundamentally realigns incentives:
+
+**Aligned Incentives:**
+Labelers stake capital and earn based on accuracy, not volume. Economic skin-in-the-game ensures quality.
+
+**Guaranteed Quality:**
+Multi-labeler consensus with reputation weighting. Every label is validated by multiple independent annotators.
+
+**Verifiable Provenance:**
+All labels are traceable and auditable on-chain. Complete transparency from annotation to consumption.
+
+**Agent-Native Design:**
+Purpose-built access layer for AI consumption via API, MCP server, and vector search.
+
+---
+
+## 3. How It Works
+
+### 3.1 The Protocol Flow
+
+1. **Data Providers** upload datasets and define labeling requirements
+2. **Staked Labelers** claim tasks and submit annotations
+3. **Consensus Engine** aggregates labels weighted by reputation
+4. **Verified Data** is indexed and made available to consumers
+5. **AI Agents** query data through optimized access layer
+6. **Usage Fees** flow back to labelers as perpetual royalties
+
+### 3.2 The Flywheel Effect
+
+**Quality attracts demand:** Verified, high-quality datasets attract AI developers who need reliable training data.
+
+**Demand generates fees:** Data access fees create ongoing revenue that flows to labelers as royalties.
+
+**Fees attract labelers:** Attractive economics bring more skilled labelers to the platform.
+
+**Labelers improve quality:** Competition and reputation systems drive continuous quality improvement.
+
+This flywheel creates compounding network effects where more participants improve the system for everyone.
+
+---
+
+## 4. Key Differentiators
+
+### 4.1 Cryptoeconomic Quality Assurance
+
+Unlike traditional platforms that rely on manual review or statistical sampling, Elastic Studio uses economic incentives to guarantee quality:
+
+| Mechanism | Traditional Platforms | Elastic Studio |
+|-----------|----------------------|----------------|
+| Quality check | Random sampling (5-10%) | 100% consensus validation |
+| Accountability | None | Stake slashing |
+| Incentive | Pay per label | Pay per accurate label |
+| Audit trail | Internal logs only | On-chain, publicly verifiable |
+
+### 4.2 Reputation-Weighted Consensus
+
+Our novel consensus mechanism combines insights from:
+
+- **Delegated Proof of Stake:** Economic security through staking
+- **Prediction Markets:** Wisdom of weighted crowds
+- **PageRank:** Reputation propagation through agreement networks
+
+The final label is determined by reputation and stake-weighted voting:
+
+$$
+\text{Final Label} = \arg\max_{L} \sum_{i: L_i = L} \frac{R_i \cdot \sqrt{S_i}}{\sum_j R_j \cdot \sqrt{S_j}}
+$$
+
+### 4.3 Agent-Native Access Layer
+
+Purpose-built for AI consumption:
+
+- **MCP Server:** Native integration with Claude, Cursor, and LLM toolchains
+- **Vector Search:** Semantic retrieval for RAG applications  
+- **Streaming API:** Real-time data feeds for continuous learning
+
+### 4.4 Perpetual Royalties
+
+Labelers earn ongoing income when data they contributed to is accessed. This creates long-term alignment with data quality, rewards early contributors as datasets gain value, and enables passive income for high-quality labelers.
+
+---
+
+## 5. Token Economics Summary
+
+### 5.1 ELASTIC Token Utility
+
+| Function | Description | Value Accrual |
+|----------|-------------|---------------|
+| **Staking** | Required for labeling participation | Reduces circulating supply |
+| **Payment** | Data consumers pay access fees | Direct demand driver |
+| **Governance** | Protocol parameter control | Long-term alignment |
+| **Rewards** | Labeling + royalties + yield | Attracts participants |
+
+### 5.2 Value Capture Model
+
+Revenue flows through the protocol:
+
+- **80%** of data access fees → Labeler rewards and royalties
+- **15%** of fees → Protocol treasury for development
+- **5%** of fees → Token burn (deflationary pressure)
+
+### 5.3 Token Metrics
+
+| Metric | Value |
+|--------|-------|
+| Total Supply | 1,000,000,000 ELASTIC |
+| Initial Circulating | 150,000,000 (15%) |
+| Community Allocation | 400,000,000 (40%) |
+| Target Staking Rate | 40-60% of supply |
+
+---
+
+## 6. Roadmap
+
+### 6.1 Development Status
+
+| Component | Status | Completion |
+|-----------|--------|------------|
+| Protocol specification | Complete | 100% |
+| Smart contracts | In development | 60% |
+| Labeling interface | In development | 70% |
+| API and MCP server | Planned | 20% |
+| Vector indexing | Planned | 10% |
+
+### 6.2 Key Milestones
+
+| Milestone | Target | Success Criteria |
+|-----------|--------|------------------|
+| Testnet launch | Q4 2024 | 1,000 test labels, 100 labelers |
+| Mainnet launch | Q1 2025 | Smart contracts deployed, audited |
+| Token Generation Event | Q2 2025 | Token live on exchanges |
+| Product-market fit | Q4 2025 | 10 paying enterprise customers |
+| Scale | Q2 2026 | 10M labeled records, 1M USD ARR |
+
+---
+
+## 7. Competitive Landscape
+
+### 7.1 Market Positioning
+
+Elastic Studio targets the high-quality, moderate-cost quadrant—providing enterprise-grade quality at crowdsourcing-level economics through protocol efficiency.
+
+### 7.2 Competitive Comparison
+
+| Factor | Scale AI | MTurk | Elastic Studio |
+|--------|----------|-------|----------------|
+| Quality guarantee | Manual review | None | Economic + consensus |
+| Price per label | 0.10-5.00 USD | 0.01-0.10 USD | 0.02-0.50 USD |
+| Scalability | Human ops limited | Unlimited | Protocol-driven |
+| Transparency | Black box | Anonymous | On-chain |
+| Agent integration | API only | Export only | MCP + Vector + API |
+| Labeler incentive | Fixed pay | Fixed pay | Performance-based |
+
+---
+
+## 8. Investment Highlights
+
+**8.7B USD Market by 2028:**
+Data labeling market growing at 42% CAGR, driven by AI adoption across industries.
+
+**Novel Economic Model:**
+First protocol to combine staking, reputation, and consensus for data quality assurance.
+
+**Agent-First Design:**
+Purpose-built for the emerging AI agent economy with native MCP integration.
+
+**Defensible Moat:**
+Network effects create compounding advantage—more labelers improve quality, attracting more data, attracting more labelers.
+
+---
+
+## 9. Use of Funds
+
+| Category | Allocation | Purpose |
+|----------|------------|---------|
+| **Engineering** | 45% | Protocol development, infrastructure |
+| **Security** | 15% | Audits, bug bounties, insurance |
+| **Growth** | 20% | Marketing, partnerships, community |
+| **Operations** | 10% | Legal, compliance, administration |
+| **Reserve** | 10% | Runway extension, opportunities |
+
+---
+
+## 10. Team
+
+*[To be completed with team backgrounds, relevant experience, and advisor network]*
+
+---
+
+## 11. Contact
+
+For investment inquiries, partnership opportunities, or technical questions:
+
+**Email:** investors@elasticstudio.io

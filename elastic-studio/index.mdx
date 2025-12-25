@@ -1,0 +1,232 @@
+---
+title: "Elastic Studio"
+description: "A Decentralized Protocol for Incentive-Aligned Data Labeling"
+icon: "database"
+---
+
+## Abstract
+
+Elastic Studio is a decentralized data labeling protocol that applies cryptoeconomic mechanism design to solve the quality assurance problem in human annotation. The protocol implements a Reputation-Weighted Consensus Protocol (RWCP) where labelers stake economic value as commitment to accuracy, and influence is earned through demonstrated competence rather than purchased. We show that under honest majority assumptions, the protocol converges to correct labels with high probability while maintaining resistance to Sybil and collusion attacks.
+
+---
+
+## 1. Introduction
+
+The rapid advancement of artificial intelligence has created unprecedented demand for high-quality labeled data. Foundation models, reinforcement learning systems, and retrieval-augmented generation (RAG) applications all depend on human-annotated datasets for training, evaluation, and grounding. Yet the infrastructure for producing this data remains fundamentally unchanged from early crowdsourcing approaches.
+
+### 1.1 The Data Labeling Problem
+
+Current data labeling solutions face several systemic challenges:
+
+**Quality Inconsistency:** Traditional crowdsourcing platforms compensate labelers per task regardless of accuracy. This creates an incentive structure that rewards speed over quality—labelers maximize income by completing tasks quickly rather than correctly.
+
+**Misaligned Incentives:** Without economic accountability, labelers face no consequences for poor quality work. The burden falls entirely on data providers to detect and remediate errors through costly manual review.
+
+**No Verifiable Provenance:** Labels lack cryptographic attestation linking them to specific contributors. This makes quality auditing difficult and prevents accountability for systematic errors.
+
+**Limited Agent Integration:** Existing platforms are designed for human data scientists, not programmatic consumption by AI agents. The emerging paradigm of agentic AI requires data infrastructure optimized for machine-to-machine interaction.
+
+### 1.2 Our Contribution
+
+Elastic Studio addresses these challenges through a novel synthesis of:
+
+1. **Cryptoeconomic Staking:** Labelers must stake tokens to participate, creating economic accountability
+2. **Reputation-Weighted Consensus:** Multiple labelers annotate each item; votes are weighted by demonstrated accuracy
+3. **On-chain Verification:** All labels, consensus results, and reputation updates are recorded on a public blockchain
+4. **Agent-Native Access:** Data is exposed through REST API, Model Context Protocol (MCP), and vector search interfaces
+
+The key insight is that quality assurance becomes an emergent property of properly designed incentives rather than an enforcement problem requiring manual oversight.
+
+---
+
+## 2. The Delegated Proof of Stake Analogy
+
+Elastic Studio can be understood as **Delegated Proof of Stake (DPoS) for Data**—where the "blocks" being produced are verified labels rather than transaction records.
+
+| Concept          | Blockchain DPoS         | Elastic Studio                 |
+| ---------------- | ----------------------- | ------------------------------ |
+| Block content    | Transactions            | Labeled data                   |
+| Validator role   | Transaction ordering    | Label consensus                |
+| Stake utility    | Block production rights | Labeling participation         |
+| Slashing trigger | Double signing          | Malicious/inaccurate labeling  |
+| Reward source    | Block rewards + fees    | Task rewards + usage royalties |
+
+This analogy illuminates the protocol design: just as blockchain validators are economically incentivized to produce valid blocks (and penalized for invalid ones), Elastic Studio labelers are incentivized to produce accurate labels.
+
+---
+
+## 3. Protocol Overview
+
+### 3.1 Participants
+
+The protocol involves three primary participant types:
+
+**Data Providers:** Organizations or individuals who upload datasets requiring annotation. Providers define labeling schemas, quality requirements, and fund reward pools in ELASTIC tokens.
+
+**Labelers (Stakers):** Token holders who stake ELASTIC to participate in labeling tasks. Labelers build reputation through accurate contributions and earn rewards proportional to their performance.
+
+**Data Consumers:** AI agents, developers, and applications that query verified datasets. Consumers pay access fees in ELASTIC, which flow to labelers as ongoing royalties.
+
+### 3.2 Core Workflow
+
+1. **Data Ingestion:** Provider uploads raw data with labeling schema
+2. **Task Distribution:** Protocol chunks data into atomic tasks and assigns to eligible labelers
+3. **Annotation:** Multiple labelers independently annotate each task
+4. **Consensus:** Reputation-weighted voting determines final label
+5. **Reward Distribution:** Labelers receive rewards proportional to agreement with consensus
+6. **Indexing:** Finalized labels are embedded and indexed for retrieval
+7. **Access:** Consumers query verified data through API/MCP/Vector interfaces
+8. **Royalties:** Access fees are distributed to contributing labelers
+
+### 3.3 Quality Assurance Mechanism
+
+Quality emerges from the intersection of three mechanisms:
+
+**Economic Stake:** Labelers must lock tokens to participate. Malicious behavior results in stake slashing, creating direct financial consequences for poor quality.
+
+**Reputation Weighting:** Votes are weighted by historical accuracy. High-reputation labelers have more influence, while low-reputation labelers are effectively marginalized.
+
+**Consensus Threshold:** Labels are only finalized when weighted agreement exceeds a configurable threshold θ (default 70%), ensuring sufficient confidence.
+
+---
+
+## 4. Technical Architecture
+
+The protocol implements a four-layer architecture:
+
+### 4.1 Data Layer
+
+Handles dataset ingestion, validation, storage, and indexing:
+
+- Format validation and content policy enforcement
+- Chunking into atomic labeling tasks
+- Vector embedding and semantic indexing
+
+### 4.2 Consensus Layer
+
+Manages labeling workflow and quality assurance:
+
+- Task assignment based on eligibility and reputation
+- Multi-labeler annotation collection
+- Reputation-weighted vote aggregation
+- Consensus determination and dispute resolution
+
+### 4.3 Incentive Layer
+
+Implements cryptoeconomic mechanisms:
+
+- ERC-20 token staking and unstaking
+- Reward calculation and distribution
+- Slashing for provable misbehavior
+- Royalty accrual and payment
+
+### 4.4 Access Layer
+
+Provides agent-optimized data retrieval:
+
+- REST API for programmatic access
+- MCP server for native AI tool integration
+- Vector search for semantic retrieval
+- Bulk export for training datasets
+
+---
+
+## 5. Economic Model
+
+### 5.1 Token Utility
+
+The ELASTIC token serves four functions:
+
+| Function       | Mechanism                                   |
+| -------------- | ------------------------------------------- |
+| **Staking**    | Required deposit to participate in labeling |
+| **Payment**    | Medium of exchange for data access fees     |
+| **Governance** | Voting rights on protocol parameters        |
+| **Reward**     | Compensation for labeling contributions     |
+
+### 5.2 Reward Structure
+
+Labeler rewards are computed as:
+
+$$
+r_i = \frac{P}{N} \cdot m_R(R_i) \cdot m_S(S_i) \cdot m_A(a_i)
+$$
+
+where:
+
+- P = task reward pool
+- N = number of labelers
+- m_R = reputation multiplier (0.5× to 2.0×)
+- m_S = stake tier multiplier (1.0× to 3.0×)
+- m_A = agreement multiplier (0.5× to 1.5×)
+
+This formula creates strong incentives for quality: a high-performing labeler can earn up to 6× the reward of a low performer on the same task.
+
+### 5.3 Stake Tiers
+
+| Tier    | Minimum Stake     | Reward Multiplier |
+| ------- | ----------------- | ----------------- |
+| Bronze  | 1,000 ELASTIC     | 1.0×              |
+| Silver  | 10,000 ELASTIC    | 1.5×              |
+| Gold    | 100,000 ELASTIC   | 2.0×              |
+| Diamond | 1,000,000 ELASTIC | 3.0×              |
+
+---
+
+## 6. Supported Data Types
+
+Elastic Studio supports multimodal annotation:
+
+| Data Type  | Label Types                                  | Example Applications                         |
+| ---------- | -------------------------------------------- | -------------------------------------------- |
+| **Text**   | Classification, NER, Q&A, Sentiment          | Chatbots, search ranking, content moderation |
+| **Images** | Bounding boxes, Segmentation, Classification | Computer vision, autonomous vehicles         |
+| **Audio**  | Transcription, Diarization, Emotion          | Voice assistants, call analytics             |
+| **Video**  | Object tracking, Action recognition          | Surveillance, content understanding          |
+
+---
+
+## 7. Competitive Positioning
+
+### 7.1 vs. Traditional Crowdsourcing
+
+Unlike platforms such as Amazon Mechanical Turk or Scale AI, Elastic Studio introduces economic accountability through staking and reputation. Quality is not assured through manual review but emerges from properly aligned incentives.
+
+### 7.2 vs. Open Source Tools
+
+Unlike Label Studio which provides annotation tooling without quality assurance, Elastic Studio combines the labeling interface with a complete consensus protocol. The platform is suitable for production deployment, not just internal team annotation.
+
+### 7.3 vs. Blockchain Data Markets
+
+Unlike general-purpose data marketplaces, Elastic Studio focuses specifically on the labeling process. The protocol ensures data quality through consensus mechanisms rather than merely facilitating exchange of existing datasets.
+
+---
+
+## 8. Document Structure
+
+This whitepaper is organized as follows:
+
+| Section                 | Content                                                      |
+| ----------------------- | ------------------------------------------------------------ |
+| **System Architecture** | Component specifications and deployment topology             |
+| **Consensus Mechanism** | Reputation-weighted consensus protocol and security analysis |
+| **Token Economics**     | ELASTIC token utility, distribution, and incentive design    |
+| **Data Flow**           | End-to-end lifecycle from upload to consumption              |
+| **Security Analysis**   | Threat modeling and attack resistance                        |
+| **Governance**          | Decentralization roadmap and voting mechanisms               |
+| **Access Layer**        | API, MCP, and vector search specifications                   |
+| **Specifications**      | Formal schemas and protocol parameters                       |
+
+---
+
+## 9. Conclusion
+
+Elastic Studio represents a fundamental rethinking of data labeling infrastructure. By applying cryptoeconomic mechanism design, the protocol transforms quality assurance from an enforcement problem into an equilibrium property. The result is a scalable, decentralized system capable of producing AI-ready datasets with verifiable provenance and ongoing contributor compensation.
+
+The protocol is positioned at the intersection of three major trends:
+
+1. The exponential growth in demand for training data
+2. The emergence of agentic AI requiring machine-optimized data access
+3. The maturation of decentralized coordination mechanisms
+
+Elastic Studio provides the infrastructure for these trends to converge, enabling a new paradigm of incentive-aligned human-AI data collaboration.

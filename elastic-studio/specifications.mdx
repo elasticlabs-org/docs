@@ -1,0 +1,470 @@
+---
+title: "Technical Specifications"
+description: "Formal specifications for data schemas, smart contracts, and protocol parameters"
+icon: "code"
+---
+
+This document provides formal technical specifications for Elastic Studio, including data schemas, smart contract interfaces, protocol parameters, and system constraints.
+
+## Data Schemas
+
+### Dataset Entity
+
+<Note>
+**Definition (Dataset)**: A dataset is a tuple \(D = (id, name, type, schema, config, stats)\) where each component is defined below.
+</Note>
+
+| Field | Type | Constraints | Description |
+|-------|------|-------------|-------------|
+| `id` | string | `ds_[a-z0-9]{12}` | Unique identifier |
+| `name` | string | length ∈ [1, 200] | Human-readable name |
+| `description` | string | length ≤ 2000 | Detailed description |
+| `data_type` | enum | {text, image, audio, video} | Content type |
+| `schema` | LabelingSchema | valid schema | Label specification |
+| `reward_per_task` | decimal | > 0 | ELASTIC per task |
+| `required_labelers` | integer | ∈ [2, 10] | Labelers per task |
+| `consensus_threshold` | decimal | ∈ [0.5, 0.95] | Agreement threshold θ |
+| `created_at` | timestamp | ISO 8601 | Creation time |
+| `updated_at` | timestamp | ISO 8601 | Last modification |
+
+### Labeling Schema Types
+
+<Tabs>
+  <Tab title="Classification">
+    | Field | Type | Constraints | Description |
+    |-------|------|-------------|-------------|
+    | `type` | string | "classification" | Schema type |
+    | `labels` | string[] | 2 ≤ |L| ≤ 100 | Valid label values |
+    | `multi_label` | boolean | — | Multiple selections |
+    | `instructions` | string | length ≤ 5000 | Guidelines |
+    
+    **Label output format**:
+    
+    | Field | Type | Description |
+    |-------|------|-------------|
+    | `value` | string | Selected label |
+    | `confidence` | float | Consensus confidence ∈ [0, 1] |
+    | `distribution` | object | Vote distribution |
+  </Tab>
+  
+  <Tab title="Named Entity Recognition">
+    | Field | Type | Constraints | Description |
+    |-------|------|-------------|-------------|
+    | `type` | string | "ner" | Schema type |
+    | `entities` | string[] | 1 ≤ |E| ≤ 50 | Entity types |
+    | `overlap_allowed` | boolean | — | Permit overlapping spans |
+    | `instructions` | string | length ≤ 5000 | Entity definitions |
+    
+    **Label output format**:
+    
+    | Field | Type | Description |
+    |-------|------|-------------|
+    | `entities` | array | List of entity spans |
+    | `entities[].type` | string | Entity type |
+    | `entities[].start` | integer | Character offset start |
+    | `entities[].end` | integer | Character offset end |
+    | `entities[].text` | string | Extracted text |
+    | `entities[].confidence` | float | Span confidence ∈ [0, 1] |
+  </Tab>
+  
+  <Tab title="Bounding Box">
+    | Field | Type | Constraints | Description |
+    |-------|------|-------------|-------------|
+    | `type` | string | "bbox" | Schema type |
+    | `classes` | string[] | 1 ≤ |C| ≤ 100 | Object classes |
+    | `min_boxes` | integer | ≥ 0 | Minimum per image |
+    | `max_boxes` | integer | ≤ 500 | Maximum per image |
+    | `min_size` | float | ≥ 0.001 | Min area (normalized) |
+    
+    **Label output format**:
+    
+    | Field | Type | Description |
+    |-------|------|-------------|
+    | `boxes` | array | List of bounding boxes |
+    | `boxes[].class` | string | Object class |
+    | `boxes[].x` | float | Top-left x ∈ [0, 1] |
+    | `boxes[].y` | float | Top-left y ∈ [0, 1] |
+    | `boxes[].width` | float | Width ∈ (0, 1] |
+    | `boxes[].height` | float | Height ∈ (0, 1] |
+    | `boxes[].confidence` | float | Box confidence ∈ [0, 1] |
+  </Tab>
+  
+  <Tab title="Transcription">
+    | Field | Type | Constraints | Description |
+    |-------|------|-------------|-------------|
+    | `type` | string | "transcription" | Schema type |
+    | `language` | string | ISO 639-1 | Expected language |
+    | `timestamps` | boolean | — | Segment timing |
+    | `diarization` | boolean | — | Speaker identification |
+    
+    **Label output format**:
+    
+    | Field | Type | Description |
+    |-------|------|-------------|
+    | `text` | string | Full transcription |
+    | `language` | string | Detected language |
+    | `confidence` | float | Overall confidence ∈ [0, 1] |
+    | `segments` | array | Time-aligned segments |
+    | `segments[].start` | float | Start time (seconds) |
+    | `segments[].end` | float | End time (seconds) |
+    | `segments[].text` | string | Segment text |
+    | `segments[].speaker` | string | Speaker ID (if diarization) |
+  </Tab>
+</Tabs>
+
+### Task Entity
+
+| Field | Type | Constraints | Description |
+|-------|------|-------------|-------------|
+| `id` | string | `task_[a-z0-9]{12}` | Unique identifier |
+| `dataset_id` | string | valid dataset | Parent dataset |
+| `chunk_index` | integer | ≥ 0 | Position in dataset |
+| `storage_ref` | string | valid URI | Data location |
+| `status` | enum | see state machine | Current state |
+| `created_at` | timestamp | ISO 8601 | Creation time |
+| `finalized_at` | timestamp | ISO 8601 | Completion time |
+
+**Task states**: `pending`, `assigned`, `in_progress`, `submitted`, `consensus`, `disputed`, `finalized`
+
+### Submission Entity
+
+| Field | Type | Constraints | Description |
+|-------|------|-------------|-------------|
+| `id` | string | `sub_[a-z0-9]{12}` | Unique identifier |
+| `task_id` | string | valid task | Target task |
+| `labeler_id` | string | valid user | Submitter |
+| `label` | varies | conforms to schema | Submitted label |
+| `confidence` | float | ∈ [0, 1] | Self-reported confidence |
+| `time_spent` | integer | > 0 | Seconds on task |
+| `submitted_at` | timestamp | ISO 8601 | Submission time |
+| `agreed_with_consensus` | boolean | — | Post-hoc agreement |
+| `reward` | decimal | ≥ 0 | ELASTIC earned |
+
+### User Entity
+
+| Field | Type | Constraints | Description |
+|-------|------|-------------|-------------|
+| `id` | string | `user_[a-z0-9]{12}` | Unique identifier |
+| `wallet_address` | string | valid ETH address | Blockchain identity |
+| `reputation` | integer | ∈ [0, 1000] | Reputation score |
+| `stake` | decimal | ≥ 0 | Staked ELASTIC |
+| `stake_tier` | enum | {bronze, silver, gold, diamond} | Stake level |
+| `tasks_completed` | integer | ≥ 0 | Lifetime tasks |
+| `total_earned` | decimal | ≥ 0 | Lifetime ELASTIC |
+| `created_at` | timestamp | ISO 8601 | Registration time |
+
+---
+
+## Smart Contract Specifications
+
+### ELASTIC Token (ERC-20)
+
+**Contract**: `ElasticToken.sol`
+
+**Standard**: ERC-20 with extensions
+
+| Property | Value |
+|----------|-------|
+| Name | Elastic Studio Token |
+| Symbol | ELASTIC |
+| Decimals | 18 |
+| Max Supply | 1,000,000,000 × 10^18 |
+| Mintable | No |
+| Burnable | Yes |
+| Pausable | No |
+
+**Interface**:
+
+| Function | Parameters | Returns | Description |
+|----------|------------|---------|-------------|
+| `totalSupply` | — | uint256 | Current total supply |
+| `balanceOf` | address | uint256 | Account balance |
+| `transfer` | to, amount | bool | Transfer tokens |
+| `approve` | spender, amount | bool | Set allowance |
+| `transferFrom` | from, to, amount | bool | Transfer from allowance |
+| `burn` | amount | — | Destroy own tokens |
+| `burnFrom` | account, amount | — | Burn from allowance |
+
+**Events**:
+
+| Event | Parameters | Description |
+|-------|------------|-------------|
+| `Transfer` | from, to, value | Token transfer |
+| `Approval` | owner, spender, value | Allowance change |
+
+### Staking Contract
+
+**Contract**: `StakingContract.sol`
+
+**State Variables**:
+
+| Variable | Type | Description |
+|----------|------|-------------|
+| `stakes` | mapping(address ⇒ StakeInfo) | User stake data |
+| `totalStaked` | uint256 | Sum of all stakes |
+| `minStake` | uint256 | Minimum stake (1000 × 10^18) |
+| `unstakeDelay` | uint256 | Cooldown (7 days) |
+
+**StakeInfo Structure**:
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `amount` | uint256 | Staked tokens |
+| `lockPeriod` | uint256 | Lock duration (seconds) |
+| `startTime` | uint256 | Stake timestamp |
+| `lastClaimTime` | uint256 | Last yield claim |
+
+**Interface**:
+
+| Function | Parameters | Returns | Description |
+|----------|------------|---------|-------------|
+| `stake` | amount, lockPeriod | — | Deposit tokens |
+| `unstake` | amount | — | Withdraw tokens |
+| `getStakeTier` | address | uint8 | Get stake tier (0-3) |
+| `calculateRewards` | address | uint256 | Pending yield |
+| `claimRewards` | — | — | Claim staking yield |
+
+**Stake Tiers**:
+
+| Tier | ID | Minimum Stake | Multiplier |
+|------|-------|---------------|------------|
+| Bronze | 0 | 1,000 | 1.0× |
+| Silver | 1 | 10,000 | 1.5× |
+| Gold | 2 | 100,000 | 2.0× |
+| Diamond | 3 | 1,000,000 | 3.0× |
+
+**Events**:
+
+| Event | Parameters | Description |
+|-------|------------|-------------|
+| `Staked` | staker, amount, lockPeriod | New stake |
+| `Unstaked` | staker, amount | Withdrawal |
+| `Slashed` | staker, amount, reason | Stake reduction |
+| `RewardsClaimed` | staker, amount | Yield claimed |
+
+### Reputation Contract
+
+**Contract**: `ReputationRegistry.sol`
+
+**State Variables**:
+
+| Variable | Type | Description |
+|----------|------|-------------|
+| `reputations` | mapping(address ⇒ ReputationInfo) | User reputation |
+| `authorizedUpdaters` | mapping(address ⇒ bool) | Update permissions |
+
+**ReputationInfo Structure**:
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `score` | uint256 | Reputation (0-1000) |
+| `tasksCompleted` | uint256 | Lifetime tasks |
+| `lastUpdate` | uint256 | Last update timestamp |
+| `isProbationary` | bool | New user flag |
+
+**Interface**:
+
+| Function | Parameters | Returns | Description |
+|----------|------------|---------|-------------|
+| `getReputation` | address | uint256 | Current score |
+| `getReputationTier` | address | string | Tier name |
+| `updateReputation` | address, delta, reason | — | Modify score |
+| `getVotingWeight` | address | uint256 | Consensus weight |
+
+**Reputation Tiers**:
+
+| Tier | Score Range | Voting Weight |
+|------|-------------|---------------|
+| Novice | 0–299 | 500 (0.5×) |
+| Apprentice | 300–499 | 750 (0.75×) |
+| Journeyman | 500–699 | 1000 (1.0×) |
+| Expert | 700–849 | 1250 (1.25×) |
+| Master | 850–949 | 1500 (1.5×) |
+| Grandmaster | 950–1000 | 2000 (2.0×) |
+
+### Reward Distributor
+
+**Contract**: `RewardDistributor.sol`
+
+**Interface**:
+
+| Function | Parameters | Returns | Description |
+|----------|------------|---------|-------------|
+| `getPendingRewards` | address | (uint256, uint256, uint256) | (labeling, royalties, yield) |
+| `distributeTaskReward` | taskId, labelers[], amounts[] | — | Pay labeling rewards |
+| `distributeRoyalties` | labelers[], amounts[] | — | Pay usage royalties |
+| `claimAllRewards` | — | — | Withdraw all pending |
+
+**Events**:
+
+| Event | Parameters | Description |
+|-------|------------|-------------|
+| `RewardDistributed` | taskId, labeler, amount, type | Reward allocated |
+| `RewardsClaimed` | labeler, amount | Withdrawal |
+
+---
+
+## Protocol Parameters
+
+### Consensus Parameters
+
+| Parameter | Symbol | Default | Range | Governance |
+|-----------|--------|---------|-------|------------|
+| Labelers per task | \(N\) | 3 | [2, 10] | DAO vote |
+| Consensus threshold | \(\theta\) | 0.70 | [0.50, 0.95] | DAO vote |
+| Honeypot rate | — | 5% | [1%, 20%] | Protocol |
+| Task timeout | — | 48 hours | [12h, 168h] | DAO vote |
+| Dispute window | — | 24 hours | [6h, 72h] | DAO vote |
+
+### Reputation Parameters
+
+| Parameter | Symbol | Default | Range | Governance |
+|-----------|--------|---------|-------|------------|
+| Accuracy weight | \(\alpha\) | 0.60 | Fixed | — |
+| Completion weight | \(\beta\) | 0.20 | Fixed | — |
+| Quality weight | \(\gamma\) | 0.15 | Fixed | — |
+| Tenure weight | \(\delta\) | 0.05 | Fixed | — |
+| Initial score | — | 500 | Fixed | — |
+| Decay start | — | 7 days | [3d, 14d] | Protocol |
+| Minimum decay | — | 0.50 | Fixed | — |
+
+### Economic Parameters
+
+| Parameter | Symbol | Default | Range | Governance |
+|-----------|--------|---------|-------|------------|
+| Minimum stake | S_min | 1,000 | 100-10,000 | DAO vote |
+| Protocol fee (labeling) | φ_L | 5% | 0%-15% | DAO vote |
+| Protocol fee (access) | φ_A | 20% | 5%-30% | DAO vote |
+| Burn rate | — | 15% | [0%, 30%] | DAO vote |
+| Unstake delay | — | 7 days | [1d, 30d] | DAO vote |
+
+### Staking Yield
+
+| Lock Period | APY | Early Unlock Penalty |
+|-------------|-----|---------------------|
+| No lock | 5% | — |
+| 3 months | 10% | 20% |
+| 6 months | 15% | 30% |
+| 12 months | 25% | 50% |
+
+---
+
+## Mathematical Formulas
+
+### Reputation Score
+
+$$
+R = 1000 \cdot \left( \alpha A + \beta C + \gamma Q + \delta T \right) \cdot D
+$$
+
+Where:
+- \(A\) = Accuracy (rolling agreement rate)
+- \(C\) = Completion rate
+- \(Q\) = Quality score
+- \(T\) = Tenure bonus
+- \(D\) = Decay factor
+
+### Consensus Weighted Vote
+
+$$
+W(L) = \sum_{i: L_i = L} \frac{R_i}{\sum_{j=1}^{N} R_j}
+$$
+
+### Labeling Reward
+
+$$
+r_i = \frac{P \cdot (1 - \phi_L)}{N} \cdot m_R(R_i) \cdot m_S(S_i) \cdot m_A(a_i)
+$$
+
+Where:
+- \(m_R(R) = 0.5 + 1.5 \cdot \frac{R}{1000}\)
+- \(m_S(S)\) = Stake tier multiplier
+- \(m_A(a) = 0.5 + a\)
+
+### Usage Royalty
+
+$$
+\rho_i = F \cdot (1 - \phi_A) \cdot \frac{w_i}{\sum_j w_j}
+$$
+
+### Staking Yield
+
+$$
+Y = S \cdot \text{APY} \cdot \frac{t}{365}
+$$
+
+### Attack Cost
+
+$$
+C_{\text{attack}} = N_{\text{sybil}} \cdot S_{\min} \cdot \left( 1 + P(\text{detect}) \cdot \sigma \right)
+$$
+
+---
+
+## System Constraints
+
+### Performance Requirements
+
+| Metric | Requirement | Measurement |
+|--------|-------------|-------------|
+| API latency (p50) | < 100ms | Response time |
+| API latency (p99) | < 500ms | Response time |
+| Vector search (p50) | < 50ms | Query time |
+| Upload throughput | > 100 MB/s | Sustained |
+| Task creation rate | > 1,000/s | Peak |
+
+### Capacity Limits
+
+| Resource | Limit | Notes |
+|----------|-------|-------|
+| Dataset size | 10M records | Per dataset |
+| Task size | 10 MB | Per chunk |
+| API response | 10 MB | Per request |
+| Concurrent connections | 10,000 | Per region |
+| Vector dimensions | 4,096 | Maximum |
+
+### Availability Targets
+
+| Component | Uptime SLA | RTO | RPO |
+|-----------|------------|-----|-----|
+| API Gateway | 99.95% | 5 min | 0 |
+| Consensus Engine | 99.99% | 1 min | 0 |
+| Smart Contracts | 99.99% | N/A | 0 |
+| Vector Index | 99.9% | 15 min | 1 min |
+
+---
+
+## Versioning
+
+### API Versioning
+
+| Version | Status | End of Life |
+|---------|--------|-------------|
+| v1 | Current | — |
+
+**Version header**: `X-API-Version: 1`
+
+### Contract Versioning
+
+Contracts are immutable. Upgrades deploy new contracts with migration periods.
+
+| Contract | Version | Address |
+|----------|---------|---------|
+| ElasticToken | 1.0.0 | TBD |
+| StakingContract | 1.0.0 | TBD |
+| ReputationRegistry | 1.0.0 | TBD |
+| RewardDistributor | 1.0.0 | TBD |
+
+---
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Consensus Mechanism" icon="scale-balanced" href="/elastic-studio/consensus">
+    Detailed consensus protocol
+  </Card>
+  
+  <Card title="Token Economics" icon="chart-line" href="/elastic-studio/tokenomics">
+    Economic model details
+  </Card>
+</CardGroup>
