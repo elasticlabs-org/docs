@@ -23,9 +23,7 @@
           },
           {
             "group": "Market & Strategy",
-            "pages": [
-              "elastic-studio/market-analysis"
-            ]
+            "pages": ["elastic-studio/market-analysis"]
           },
           {
             "group": "Protocol Design",
@@ -37,9 +35,7 @@
           },
           {
             "group": "Economic Model",
-            "pages": [
-              "elastic-studio/tokenomics"
-            ]
+            "pages": ["elastic-studio/tokenomics"]
           },
           {
             "group": "Security & Governance",
@@ -62,18 +58,11 @@
         "groups": [
           {
             "group": "Getting started",
-            "pages": [
-              "index",
-              "quickstart",
-              "development"
-            ]
+            "pages": ["index", "quickstart", "development"]
           },
           {
             "group": "Customization",
-            "pages": [
-              "essentials/settings",
-              "essentials/navigation"
-            ]
+            "pages": ["essentials/settings", "essentials/navigation"]
           },
           {
             "group": "Writing content",
@@ -99,9 +88,7 @@
         "groups": [
           {
             "group": "API documentation",
-            "pages": [
-              "api-reference/introduction"
-            ]
+            "pages": ["api-reference/introduction"]
           },
           {
             "group": "Endpoint examples",
@@ -131,8 +118,8 @@
     }
   },
   "logo": {
-    "light": "/logo/light.svg",
-    "dark": "/logo/dark.svg"
+    "light": "/logo/logo.webp",
+    "dark": "/logo/logo.webp"
   },
   "navbar": {
     "links": [
@@ -149,15 +136,15 @@
   },
   "contextual": {
     "options": [
-     "copy",
-     "view",
-     "chatgpt",
-     "claude",
-     "perplexity",
-     "mcp",
-     "cursor",
-     "vscode"
-   ]
+      "copy",
+      "view",
+      "chatgpt",
+      "claude",
+      "perplexity",
+      "mcp",
+      "cursor",
+      "vscode"
+    ]
   },
   "footer": {
     "socials": {
