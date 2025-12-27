@@ -17,26 +17,26 @@ flowchart TB
     subgraph TAM [Total Addressable Market]
         AI[AI Infrastructure Market - 180B by 2028]
     end
-    
+
     subgraph SAM [Serviceable Addressable Market]
         Data[AI Data Services - 45B by 2028]
     end
-    
+
     subgraph SOM [Serviceable Obtainable Market]
         Label[Data Labeling - 8.7B by 2028]
     end
-    
+
     AI --> Data --> Label
 ```
 
 ### Market Sizing
 
-| Market Segment | 2024 | 2026 | 2028 | CAGR |
-|----------------|------|------|------|------|
-| **AI Infrastructure (TAM)** | 65B | 110B | 180B | 29% |
-| **AI Data Services (SAM)** | 18B | 28B | 45B | 26% |
-| **Data Labeling (SOM)** | 2.1B | 4.5B | 8.7B | 42% |
-| **Decentralized Data (Target)** | 50M | 300M | 1.2B | 120% |
+| Market Segment                  | 2024 | 2026 | 2028 | CAGR |
+| ------------------------------- | ---- | ---- | ---- | ---- |
+| **AI Infrastructure (TAM)**     | 65B  | 110B | 180B | 29%  |
+| **AI Data Services (SAM)**      | 18B  | 28B  | 45B  | 26%  |
+| **Data Labeling (SOM)**         | 2.1B | 4.5B | 8.7B | 42%  |
+| **Decentralized Data (Target)** | 50M  | 300M | 1.2B | 120% |
 
 **Sources**: Gartner, IDC, Grand View Research, Internal Analysis
 
@@ -44,52 +44,56 @@ flowchart TB
 
 <AccordionGroup>
   <Accordion title="Generative AI Explosion" icon="explosion">
-    **Impact**: The rise of LLMs and multimodal models has dramatically increased demand for diverse, high-quality training data.
-    
-    | Model Type | Data Requirement | Growth Rate |
-    |------------|------------------|-------------|
-    | LLMs | 10T+ tokens | 10× per generation |
-    | Vision models | 1B+ images | 5× per year |
-    | Multimodal | Combined + paired | 20× per year |
-    
-    **Key insight**: Model capabilities scale with data quality and diversity, not just quantity.
+**Impact**: The rise of LLMs and multimodal models has dramatically increased demand for diverse, high-quality training data.
+
+**Data requirements by model type**:
+
+- **LLMs**: 10T+ tokens, 10× growth per generation
+- **Vision models**: 1B+ images, 5× per year
+- **Multimodal**: Combined + paired data, 20× per year
+
+**Key insight**: Model capabilities scale with data quality and diversity, not just quantity.
+
   </Accordion>
-  
+
   <Accordion title="AI Agent Proliferation" icon="robot">
-    **Impact**: Autonomous AI agents require verified, real-time data access for decision-making.
-    
-    | Application | Data Needs | Market Size |
-    |-------------|------------|-------------|
-    | Coding assistants | Code + documentation | 5B by 2027 |
-    | Customer service | Conversation + intent | 8B by 2027 |
-    | Research agents | Scientific + citations | 3B by 2027 |
-    
-    **Key insight**: Agents need curated, verified data — not raw web scrapes.
+**Impact**: Autonomous AI agents require verified, real-time data access for decision-making.
+
+**Agent market by application**:
+
+- **Coding assistants**: Code + documentation, 5B by 2027
+- **Customer service**: Conversation + intent, 8B by 2027
+- **Research agents**: Scientific + citations, 3B by 2027
+
+**Key insight**: Agents need curated, verified data — not raw web scrapes.
+
   </Accordion>
-  
+
   <Accordion title="Enterprise AI Adoption" icon="building">
-    **Impact**: Enterprises are moving from AI experimentation to production deployment.
-    
-    | Adoption Stage | % of Enterprises | Data Spend |
-    |----------------|------------------|------------|
-    | Experimentation | 45% | Low |
-    | Pilot projects | 35% | Medium |
-    | Production | 15% | High |
-    | AI-native | 5% | Very high |
-    
-    **Key insight**: Production AI requires domain-specific, high-quality labeled data.
+**Impact**: Enterprises are moving from AI experimentation to production deployment.
+
+**Adoption stages**:
+
+- **Experimentation** (45%): Low data spend
+- **Pilot projects** (35%): Medium data spend
+- **Production** (15%): High data spend
+- **AI-native** (5%): Very high data spend
+
+**Key insight**: Production AI requires domain-specific, high-quality labeled data.
+
   </Accordion>
-  
+
   <Accordion title="Regulatory Requirements" icon="gavel">
-    **Impact**: AI regulations (EU AI Act, etc.) mandate data quality documentation and traceability.
-    
-    | Requirement | Traditional | Elastic Studio |
-    |-------------|-------------|----------------|
-    | Data provenance | Manual documentation | On-chain records |
-    | Quality metrics | Self-reported | Consensus confidence |
-    | Bias auditing | Expensive studies | Transparent distributions |
-    
-    **Key insight**: Verifiable data quality becomes a compliance requirement.
+**Impact**: AI regulations (EU AI Act, etc.) mandate data quality documentation and traceability.
+
+**Comparison**:
+
+- **Data provenance**: Manual documentation → On-chain records
+- **Quality metrics**: Self-reported → Consensus confidence
+- **Bias auditing**: Expensive studies → Transparent distributions
+
+**Key insight**: Verifiable data quality becomes a compliance requirement.
+
   </Accordion>
 </AccordionGroup>
 
@@ -99,13 +103,13 @@ flowchart TB
 
 ### By Data Type
 
-| Segment | Market Share | Growth Rate | Key Players |
-|---------|--------------|-------------|-------------|
-| **Text** | 45% | 35% | Scale AI, Appen |
-| **Image** | 30% | 45% | Labelbox, V7 |
-| **Audio** | 12% | 50% | Rev.ai, Deepgram |
-| **Video** | 8% | 55% | Supervisely |
-| **Multimodal** | 5% | 80% | Emerging |
+| Segment        | Market Share | Growth Rate | Key Players      |
+| -------------- | ------------ | ----------- | ---------------- |
+| **Text**       | 45%          | 35%         | Scale AI, Appen  |
+| **Image**      | 30%          | 45%         | Labelbox, V7     |
+| **Audio**      | 12%          | 50%         | Rev.ai, Deepgram |
+| **Video**      | 8%           | 55%         | Supervisely      |
+| **Multimodal** | 5%           | 80%         | Emerging         |
 
 ### By Use Case
 
@@ -121,13 +125,13 @@ pie title Data Labeling Market by Use Case
 
 ### By Customer Segment
 
-| Segment | Characteristics | Willingness to Pay | Volume |
-|---------|-----------------|-------------------|--------|
-| **Big Tech** | In-house capabilities, supplemental | Low | Very High |
-| **AI Startups** | Speed-focused, quality-sensitive | Medium-High | Medium |
-| **Enterprise** | Compliance needs, domain-specific | High | High |
-| **Research** | Budget-constrained, quality-critical | Medium | Low |
-| **Crypto/Web3** | Decentralization-native, early adopter | High | Low-Medium |
+| Segment         | Characteristics                        | Willingness to Pay | Volume     |
+| --------------- | -------------------------------------- | ------------------ | ---------- |
+| **Big Tech**    | In-house capabilities, supplemental    | Low                | Very High  |
+| **AI Startups** | Speed-focused, quality-sensitive       | Medium-High        | Medium     |
+| **Enterprise**  | Compliance needs, domain-specific      | High               | High       |
+| **Research**    | Budget-constrained, quality-critical   | Medium             | Low        |
+| **Crypto/Web3** | Decentralization-native, early adopter | High               | Low-Medium |
 
 ---
 
@@ -142,17 +146,17 @@ flowchart TB
         Mid[Mid-Market<br/>Appen, Telus]
         Commodity[Commodity<br/>MTurk, Clickworker]
     end
-    
+
     subgraph Decentralized [Decentralized / Web3]
         Existing[Existing<br/>Ocean Protocol, Reppo]
         Elastic[Elastic Studio]
     end
-    
+
     subgraph Internal [Internal Solutions]
         InHouse[In-house Teams]
         OSS[Open Source<br/>Label Studio, CVAT]
     end
-    
+
     Premium --> Market[Data Labeling Market]
     Mid --> Market
     Commodity --> Market
@@ -166,87 +170,116 @@ flowchart TB
 
 <Tabs>
   <Tab title="Scale AI">
-    **Overview**: Market leader in managed data labeling services.
-    
-    | Dimension | Assessment |
-    |-----------|------------|
-    | **Strengths** | Enterprise relationships, diverse capabilities, quality processes |
-    | **Weaknesses** | High prices, black-box quality, no token incentive |
-    | **Market position** | Premium enterprise segment |
-    | **Pricing** | 0.10 - 5.00 USD per label |
-    | **Threat level** | Medium — different market segment |
-    
-    **Differentiation opportunity**: Transparent quality, lower costs, agent integration
+**Overview**: Market leader in managed data labeling services.
+
+- **Strengths**: Enterprise relationships, diverse capabilities, quality processes
+- **Weaknesses**: High prices, black-box quality, no token incentive
+- **Market position**: Premium enterprise segment
+- **Pricing**: 0.10 - 5.00 USD per label
+- **Threat level**: Medium — different market segment
+
+**Differentiation opportunity**: Transparent quality, lower costs, agent integration
+
   </Tab>
-  
+
   <Tab title="Labelbox">
-    **Overview**: Platform-focused, self-service data labeling tools.
-    
-    | Dimension | Assessment |
-    |-----------|------------|
-    | **Strengths** | Modern UI, ML-assisted labeling, integrations |
-    | **Weaknesses** | Workforce management separate, quality varies |
-    | **Market position** | Mid-market, developer-focused |
-    | **Pricing** | 0.05 - 1.00 USD per label + platform fee |
-    | **Threat level** | Medium — tools vs. protocol |
-    
-    **Differentiation opportunity**: Integrated workforce + quality guarantee
+**Overview**: Platform-focused, self-service data labeling tools.
+
+- **Strengths**: Modern UI, ML-assisted labeling, integrations
+- **Weaknesses**: Workforce management separate, quality varies
+- **Market position**: Mid-market, developer-focused
+- **Pricing**: 0.05 - 1.00 USD per label + platform fee
+- **Threat level**: Medium — tools vs. protocol
+
+**Differentiation opportunity**: Integrated workforce + quality guarantee
+
   </Tab>
-  
+
   <Tab title="Amazon MTurk">
-    **Overview**: Original crowdsourcing platform, commodity positioning.
-    
-    | Dimension | Assessment |
-    |-----------|------------|
-    | **Strengths** | Massive workforce, low prices, API access |
-    | **Weaknesses** | Quality inconsistent, no accountability, spam |
-    | **Market position** | Commodity, volume-focused |
-    | **Pricing** | 0.01 - 0.10 USD per label |
-    | **Threat level** | Low — different quality tier |
-    
-    **Differentiation opportunity**: Quality guarantee, economic accountability
+**Overview**: Original crowdsourcing platform, commodity positioning.
+
+- **Strengths**: Massive workforce, low prices, API access
+- **Weaknesses**: Quality inconsistent, no accountability, spam
+- **Market position**: Commodity, volume-focused
+- **Pricing**: 0.01 - 0.10 USD per label
+- **Threat level**: Low — different quality tier
+
+**Differentiation opportunity**: Quality guarantee, economic accountability
+
   </Tab>
-  
+
   <Tab title="Reppo Labs">
-    **Overview**: Web3-native, prediction market approach to data quality.
-    
-    | Dimension | Assessment |
-    |-----------|------------|
-    | **Strengths** | Crypto-native, novel mechanism, early mover |
-    | **Weaknesses** | Text-focused, limited UI, early stage |
-    | **Market position** | Web3 niche |
-    | **Pricing** | Token-based |
-    | **Threat level** | Medium — similar thesis, different execution |
-    
-    **Differentiation opportunity**: Multimodal support, superior UX, agent integration
+**Overview**: Web3-native, prediction market approach to data quality.
+
+- **Strengths**: Crypto-native, novel mechanism, early mover
+- **Weaknesses**: Text-focused, limited UI, early stage
+- **Market position**: Web3 niche
+- **Pricing**: Token-based
+- **Threat level**: Medium — similar thesis, different execution
+
+**Differentiation opportunity**: Multimodal support, superior UX, agent integration
+
   </Tab>
-  
+
   <Tab title="Label Studio">
-    **Overview**: Open-source labeling tool, self-hosted.
-    
-    | Dimension | Assessment |
-    |-----------|------------|
-    | **Strengths** | Free, customizable, strong community, multimodal |
-    | **Weaknesses** | No workforce, no quality assurance, ops burden |
-    | **Market position** | Developer tools, OSS |
-    | **Pricing** | Free (self-hosted) / Enterprise tiers |
-    | **Threat level** | Low — complementary (we fork their UI) |
-    
-    **Differentiation opportunity**: Add workforce + incentive layer to proven UI
+**Overview**: Open-source labeling tool, self-hosted.
+
+- **Strengths**: Free, customizable, strong community, multimodal
+- **Weaknesses**: No workforce, no quality assurance, ops burden
+- **Market position**: Developer tools, OSS
+- **Pricing**: Free (self-hosted) / Enterprise tiers
+- **Threat level**: Low — complementary (we fork their UI)
+
+**Differentiation opportunity**: Add workforce + incentive layer to proven UI
+
   </Tab>
 </Tabs>
 
 ### Competitive Positioning Matrix
 
-| Factor | Weight | Scale AI | Labelbox | MTurk | Reppo | Elastic Studio |
-|--------|--------|----------|----------|-------|-------|----------------|
-| Quality guarantee | 25% | 7 | 5 | 3 | 6 | 9 |
-| Cost efficiency | 20% | 4 | 6 | 9 | 7 | 8 |
-| Scalability | 15% | 7 | 7 | 9 | 6 | 8 |
-| Transparency | 15% | 3 | 4 | 2 | 8 | 10 |
-| Agent integration | 15% | 5 | 5 | 3 | 4 | 9 |
-| Multimodal | 10% | 8 | 7 | 6 | 4 | 8 |
-| **Weighted Score** | 100% | **5.6** | **5.5** | **5.1** | **5.9** | **8.7** |
+| Factor             | Weight | Scale AI | Labelbox | MTurk   | Reppo   | Elastic Studio |
+| ------------------ | ------ | -------- | -------- | ------- | ------- | -------------- |
+| Quality guarantee  | 25%    | 7        | 5        | 3       | 6       | 9              |
+| Cost efficiency    | 20%    | 4        | 6        | 9       | 7       | 8              |
+| Scalability        | 15%    | 7        | 7        | 9       | 6       | 8              |
+| Transparency       | 15%    | 3        | 4        | 2       | 8       | 10             |
+| Agent integration  | 15%    | 5        | 5        | 3       | 4       | 9              |
+| Multimodal         | 10%    | 8        | 7        | 6       | 4       | 8              |
+| **Weighted Score** | 100%   | **5.6**  | **5.5**  | **5.1** | **5.9** | **8.7**        |
+
+### Agent-Era Competitive Analysis
+
+The emergence of AI agents fundamentally changes competitive dynamics. Traditional platforms were built for ML model training; agents require different capabilities:
+
+| Dimension             | Scale AI / HumanSignal | Roboflow        | Elastic Studio          |
+| --------------------- | ---------------------- | --------------- | ----------------------- |
+| **Primary use case**  | ML model training      | Computer vision | LLM/Agent data          |
+| **Quality mechanism** | Centralized QA teams   | Manual review   | Decentralized consensus |
+| **Data access**       | Batch export           | API             | MCP + Vector + API      |
+| **Verification**      | Trust-based scores     | Trust-based     | Cryptographic proof     |
+| **Agent integration** | None native            | None            | First-class MCP         |
+| **Real-time access**  | No (export pipeline)   | Limited         | Yes (sub-100ms)         |
+| **Payment model**     | Subscription/per-label | Subscription    | Per-query (x402)        |
+
+**Why This Matters for Agents:**
+
+1. **Scale AI / HumanSignal** produce high-quality data for ML training, but their batch export model is incompatible with agents that need real-time data access. Agents cannot wait for dataset exports.
+
+2. **Roboflow** excels at computer vision workflows but lacks the text/knowledge labeling and MCP integration that LLM agents require.
+
+3. **Elastic Studio** is purpose-built for the agent era: real-time API access, MCP-native integration, cryptographic verification proofs, and per-query micropayments.
+
+### The Agent Integration Gap
+
+Traditional platforms fail to meet agent requirements:
+
+| Requirement                | Traditional Platforms | Elastic Studio     |
+| -------------------------- | --------------------- | ------------------ |
+| Real-time access           | Batch export only     | Sub-100ms API      |
+| Cryptographic verification | Trust-based           | ZK proofs          |
+| MCP integration            | None                  | Native support     |
+| Per-query billing          | Subscription model    | x402 micropayments |
+| Semantic search            | ID lookup             | Vector database    |
 
 ---
 
@@ -257,12 +290,12 @@ flowchart TB
 ```mermaid
 flowchart TB
     Center[Industry<br/>Rivalry<br/>Medium-High]
-    
+
     Suppliers[Supplier Power<br/>LOW<br/>Abundant labor supply]
     Buyers[Buyer Power<br/>MEDIUM<br/>Switching costs low]
     NewEntrants[New Entrants<br/>MEDIUM<br/>Capital + network required]
     Substitutes[Substitutes<br/>MEDIUM<br/>Synthetic data emerging]
-    
+
     Suppliers --> Center
     Buyers --> Center
     NewEntrants --> Center
@@ -271,57 +304,62 @@ flowchart TB
 
 <AccordionGroup>
   <Accordion title="Industry Rivalry (Medium-High)" icon="fire">
-    **Assessment**: Fragmented market with several well-funded players competing on different dimensions.
-    
-    - Scale AI dominates enterprise
-    - Labelbox strong in self-service
-    - Many regional/specialized players
-    - Price competition in commodity segment
-    
-    **Implication**: Differentiation through mechanism (not just features) is key
+**Assessment**: Fragmented market with several well-funded players competing on different dimensions.
+
+- Scale AI dominates enterprise
+- Labelbox strong in self-service
+- Many regional/specialized players
+- Price competition in commodity segment
+
+**Implication**: Differentiation through mechanism (not just features) is key.
+
   </Accordion>
-  
+
   <Accordion title="Supplier Power (Low)" icon="users">
-    **Assessment**: Large global pool of potential labelers, no single supplier has leverage.
-    
-    - Millions of potential annotators worldwide
-    - Skills are learnable (not specialized)
-    - Platform creates value, not individual labelers
-    
-    **Implication**: Protocol design matters more than supplier relationships
+**Assessment**: Large global pool of potential labelers, no single supplier has leverage.
+
+- Millions of potential annotators worldwide
+- Skills are learnable (not specialized)
+- Platform creates value, not individual labelers
+
+**Implication**: Protocol design matters more than supplier relationships.
+
   </Accordion>
-  
+
   <Accordion title="Buyer Power (Medium)" icon="building">
-    **Assessment**: Buyers have options but switching costs exist.
-    
-    - Low switching costs between platforms
-    - BUT: data already labeled has value
-    - Enterprise buyers want reliability
-    - Quality requirements create stickiness
-    
-    **Implication**: Quality and reliability create retention
+**Assessment**: Buyers have options but switching costs exist.
+
+- Low switching costs between platforms
+- BUT: data already labeled has value
+- Enterprise buyers want reliability
+- Quality requirements create stickiness
+
+**Implication**: Quality and reliability create retention.
+
   </Accordion>
-  
+
   <Accordion title="Threat of New Entrants (Medium)" icon="door-open">
-    **Assessment**: Significant capital and network effects required.
-    
-    - Technology is replicable
-    - Workforce networks take time to build
-    - Reputation systems have cold-start problem
-    - Regulatory complexity increasing
-    
-    **Implication**: First-mover advantage in crypto-native segment
+**Assessment**: Significant capital and network effects required.
+
+- Technology is replicable
+- Workforce networks take time to build
+- Reputation systems have cold-start problem
+- Regulatory complexity increasing
+
+**Implication**: First-mover advantage in crypto-native segment.
+
   </Accordion>
-  
+
   <Accordion title="Threat of Substitutes (Medium)" icon="wand-magic-sparkles">
-    **Assessment**: Synthetic data and AI-assisted labeling are emerging.
-    
-    - LLMs can generate training data
-    - BUT: hallucinations, bias, homogeneity issues
-    - Hybrid approaches likely to dominate
-    - Human verification still required
-    
-    **Implication**: Position as "verified" data, not commodity labeling
+**Assessment**: Synthetic data and AI-assisted labeling are emerging.
+
+- LLMs can generate training data
+- BUT: hallucinations, bias, homogeneity issues
+- Hybrid approaches likely to dominate
+- Human verification still required
+
+**Implication**: Position as "verified" data, not commodity labeling.
+
   </Accordion>
 </AccordionGroup>
 
@@ -333,7 +371,7 @@ flowchart LR
         Raw[Raw Data]
         Synthetic[Synthetic Generation]
     end
-    
+
     subgraph Core [Data Labeling Value Chain]
         Ingest[Ingestion]
         Task[Task Design]
@@ -341,13 +379,13 @@ flowchart LR
         QA[Quality Assurance]
         Export[Export / Access]
     end
-    
+
     subgraph Downstream [Data Consumption]
         Training[Model Training]
         Inference[Inference]
         Agents[AI Agents]
     end
-    
+
     Raw --> Ingest
     Synthetic --> Ingest
     Ingest --> Task --> Label --> QA --> Export
@@ -356,12 +394,12 @@ flowchart LR
 
 **Value capture points**:
 
-| Stage | Traditional Value | Elastic Studio Value |
-|-------|-------------------|---------------------|
-| Task design | Platform fee | Included in protocol |
-| Annotation | Per-label fee | Staker rewards |
-| Quality assurance | Hidden in price | Consensus mechanism (free) |
-| Export / Access | One-time | Recurring royalties |
+| Stage             | Traditional Value | Elastic Studio Value       |
+| ----------------- | ----------------- | -------------------------- |
+| Task design       | Platform fee      | Included in protocol       |
+| Annotation        | Per-label fee     | Staker rewards             |
+| Quality assurance | Hidden in price   | Consensus mechanism (free) |
+| Export / Access   | One-time          | Recurring royalties        |
 
 ---
 
@@ -371,13 +409,13 @@ flowchart LR
 
 **Primary target**: AI startups building agent applications
 
-| Characteristic | Fit with Elastic Studio |
-|----------------|------------------------|
-| Technical sophistication | High — can integrate API/MCP |
-| Budget constraints | Value cost-efficiency |
-| Quality requirements | High — agents need reliable data |
-| Decentralization affinity | Above average |
-| Speed of adoption | Fast decision cycles |
+| Characteristic            | Fit with Elastic Studio          |
+| ------------------------- | -------------------------------- |
+| Technical sophistication  | High — can integrate API/MCP     |
+| Budget constraints        | Value cost-efficiency            |
+| Quality requirements      | High — agents need reliable data |
+| Decentralization affinity | Above average                    |
+| Speed of adoption         | Fast decision cycles             |
 
 ### Expansion Path
 
@@ -386,17 +424,17 @@ flowchart LR
     subgraph Phase1 [Phase 1: Beachhead]
         Startups[AI Startups]
     end
-    
+
     subgraph Phase2 [Phase 2: Expand]
         Research[Research Labs]
         Web3[Web3 / Crypto]
     end
-    
+
     subgraph Phase3 [Phase 3: Scale]
         Enterprise[Enterprise AI]
         BigTech[Big Tech]
     end
-    
+
     Startups --> Research & Web3
     Research --> Enterprise
     Web3 --> Enterprise
@@ -405,27 +443,28 @@ flowchart LR
 
 ### Go-to-Market Strategy
 
-| Phase | Timeline | Focus | Channels | Success Metric |
-|-------|----------|-------|----------|----------------|
-| **1. Launch** | Q1-Q2 2025 | AI startups, crypto-native | Twitter, Discord, Dev relations | 100 active labelers |
-| **2. Growth** | Q3-Q4 2025 | Research, Web3 | Conferences, partnerships | 10 enterprise customers |
-| **3. Scale** | 2026+ | Enterprise | Sales team, case studies | 1M ARR |
+| Phase         | Timeline   | Focus                      | Channels                        | Success Metric          |
+| ------------- | ---------- | -------------------------- | ------------------------------- | ----------------------- |
+| **1. Launch** | Q1-Q2 2025 | AI startups, crypto-native | Twitter, Discord, Dev relations | 100 active labelers     |
+| **2. Growth** | Q3-Q4 2025 | Research, Web3             | Conferences, partnerships       | 10 enterprise customers |
+| **3. Scale**  | 2026+      | Enterprise                 | Sales team, case studies        | 1M ARR                  |
 
 ---
 
 ## Market Risks
 
 <Warning>
-The following risks should be considered by potential investors and participants.
+  The following risks should be considered by potential investors and
+  participants.
 </Warning>
 
-| Risk | Probability | Impact | Mitigation |
-|------|-------------|--------|------------|
-| **Synthetic data disruption** | Medium | High | Position as verification layer |
-| **Regulatory changes** | Medium | Medium | Geographic diversification |
-| **Competition from Big Tech** | Low | High | Decentralization moat |
-| **Crypto market correlation** | High | Medium | Fiat payment options |
-| **Quality at scale challenges** | Medium | High | Gradual scaling, reputation |
+| Risk                            | Probability | Impact | Mitigation                     |
+| ------------------------------- | ----------- | ------ | ------------------------------ |
+| **Synthetic data disruption**   | Medium      | High   | Position as verification layer |
+| **Regulatory changes**          | Medium      | Medium | Geographic diversification     |
+| **Competition from Big Tech**   | Low         | High   | Decentralization moat          |
+| **Crypto market correlation**   | High        | Medium | Fiat payment options           |
+| **Quality at scale challenges** | Medium      | High   | Gradual scaling, reputation    |
 
 ---
 
@@ -445,12 +484,19 @@ Elastic Studio is positioned to capture this opportunity through superior mechan
 ## Next Steps
 
 <CardGroup cols={2}>
-  <Card title="Token Economics" icon="chart-line" href="/elastic-studio/tokenomics">
+  <Card
+    title="Token Economics"
+    icon="chart-line"
+    href="/elastic-studio/tokenomics"
+  >
     Economic model and incentive design
   </Card>
-  
-  <Card title="Technical Architecture" icon="sitemap" href="/elastic-studio/architecture">
+
+  <Card
+    title="Technical Architecture"
+    icon="sitemap"
+    href="/elastic-studio/architecture"
+  >
     System design and implementation
   </Card>
 </CardGroup>
-

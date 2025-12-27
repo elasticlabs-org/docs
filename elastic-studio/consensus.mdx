@@ -47,17 +47,20 @@ Our approach draws from several research areas:
 ### 2.1 System Model
 
 **Definition 1 (Labeling Task).** A task T is a tuple (D, Σ, N, θ) where:
+
 - D is the data item requiring annotation
 - Σ is the label space (valid outputs)
 - N is the number of required labelers
 - θ ∈ (0.5, 1] is the consensus threshold
 
 **Definition 2 (Labeler).** A labeler ℓ is characterized by:
+
 - Stake S_ℓ ≥ S_min (economic commitment)
 - Reputation R_ℓ ∈ [0, 1000] (demonstrated competence)
 - Accuracy A_ℓ ∈ [0, 1] (historical agreement with consensus)
 
 **Definition 3 (Submission).** For task T, labeler ℓ submits:
+
 - Label L_ℓ ∈ Σ
 - Confidence c_ℓ ∈ [0, 1]
 - Timestamp t_ℓ
@@ -65,11 +68,13 @@ Our approach draws from several research areas:
 ### 2.2 Adversary Model
 
 We consider a Byzantine adversary controlling a coalition C of labelers. The adversary can:
+
 - Submit arbitrary labels (including strategically incorrect ones)
 - Coordinate timing and label choices within coalition
 - Create new identities (subject to stake requirements)
 
 The adversary cannot:
+
 - Forge signatures of honest labelers
 - Modify on-chain state without proper transactions
 - Predict random assignment selections
@@ -107,13 +112,13 @@ $$
 
 **Component Definitions:**
 
-| Component | Weight | Description |
-|-----------|--------|-------------|
-| A (Accuracy) | α = 0.60 | Agreement rate with consensus |
-| C (Completion) | β = 0.20 | Task completion rate |
-| Q (Quality) | γ = 0.15 | Time consistency and pattern analysis |
-| T (Tenure) | δ = 0.05 | Platform experience bonus |
-| D (Decay) | — | Inactivity penalty multiplier |
+| Component      | Weight   | Description                           |
+| -------------- | -------- | ------------------------------------- |
+| A (Accuracy)   | α = 0.60 | Agreement rate with consensus         |
+| C (Completion) | β = 0.20 | Task completion rate                  |
+| Q (Quality)    | γ = 0.15 | Time consistency and pattern analysis |
+| T (Tenure)     | δ = 0.05 | Platform experience bonus             |
+| D (Decay)      | —        | Inactivity penalty multiplier         |
 
 **Accuracy Score:**
 
@@ -134,6 +139,7 @@ Q = \frac{1}{2}(Q_{\text{time}} + Q_{\text{consistency}})
 $$
 
 where:
+
 - Q_time penalizes submissions that are suspiciously fast or slow
 - Q_consistency measures deviation from historical labeling patterns
 
@@ -154,14 +160,14 @@ where d is days since last activity.
 
 Labelers are classified into tiers based on reputation score:
 
-| Tier | Score Range | Vote Weight | Access Level |
-|------|-------------|-------------|--------------|
-| Novice | 0–299 | 0.50× | Training tasks only |
-| Apprentice | 300–499 | 0.75× | Basic tasks |
-| Journeyman | 500–699 | 1.00× | Standard tasks |
-| Expert | 700–849 | 1.25× | Complex tasks |
-| Master | 850–949 | 1.50× | Review panels |
-| Grandmaster | 950–1000 | 2.00× | Arbitration |
+| Tier        | Score Range | Vote Weight | Access Level        |
+| ----------- | ----------- | ----------- | ------------------- |
+| Novice      | 0–299       | 0.50×       | Training tasks only |
+| Apprentice  | 300–499     | 0.75×       | Basic tasks         |
+| Journeyman  | 500–699     | 1.00×       | Standard tasks      |
+| Expert      | 700–849     | 1.25×       | Complex tasks       |
+| Master      | 850–949     | 1.50×       | Review panels       |
+| Grandmaster | 950–1000    | 2.00×       | Arbitration         |
 
 **Rationale:** The tier system creates clear progression incentives while ensuring that critical functions (review, arbitration) are restricted to proven participants.
 
@@ -175,12 +181,12 @@ $$
 
 The update Δ R depends on agreement level:
 
-| Agreement Level | Condition | Update |
-|-----------------|-----------|--------|
-| Strong Agree | a ≥ 0.90 | +15 × (1 − R/1000) |
-| Agree | 0.70 ≤ a < 0.90 | +5 × (1 − R/1000) |
-| Disagree | 0.30 ≤ a < 0.70 | −10 × (R/1000) |
-| Strong Disagree | a < 0.30 | −25 × (R/1000) |
+| Agreement Level | Condition       | Update             |
+| --------------- | --------------- | ------------------ |
+| Strong Agree    | a ≥ 0.90        | +15 × (1 − R/1000) |
+| Agree           | 0.70 ≤ a < 0.90 | +5 × (1 − R/1000)  |
+| Disagree        | 0.30 ≤ a < 0.70 | −10 × (R/1000)     |
+| Strong Disagree | a < 0.30        | −25 × (R/1000)     |
 
 **Property (Diminishing Returns):** The (1 − R/1000) factor makes gains harder at higher reputation levels, while the (R/1000) factor in losses means high-reputation labelers have more to lose.
 
@@ -195,22 +201,25 @@ This creates a stable equilibrium where reaching top tiers requires sustained ex
 The RWCP consensus protocol operates in three phases:
 
 **Phase 1: Assignment**
+
 - Select N eligible labelers for task T
 - Eligibility requires: stake ≥ S_min, reputation ≥ R_min
 - Selection includes randomization to prevent gaming
 
 **Phase 2: Labeling**
+
 - Each assigned labeler submits label L_i within time window
 - System records submission metadata (timing, revisions)
 
 **Phase 3: Aggregation**
+
 - Compute reputation-weighted votes
 - Determine consensus label if threshold met
 - Escalate if threshold not met
 
 ### 4.2 Weighted Vote Aggregation
 
-For a task with submissions {(L_1, R_1), ..., (L_N, R_N)}, we compute normalized weights:
+For a task with submissions \{(L_1, R_1), ..., (L_N, R_N)\}, we compute normalized weights:
 
 $$
 w_i = \frac{R_i}{\sum_{j=1}^{N} R_j}
@@ -232,11 +241,11 @@ $$
 
 **Consensus Outcomes:**
 
-| Outcome | Condition | Action |
-|---------|-----------|--------|
-| Consensus | W(L̂) ≥ θ | Finalize label |
+| Outcome    | Condition      | Action                     |
+| ---------- | -------------- | -------------------------- |
+| Consensus  | W(L̂) ≥ θ       | Finalize label             |
 | Borderline | 0.5 ≤ W(L̂) < θ | Assign additional labelers |
-| Deadlock | W(L̂) < 0.5 | Escalate to review panel |
+| Deadlock   | W(L̂) < 0.5     | Escalate to review panel   |
 
 ### 4.4 Type-Specific Aggregation
 
@@ -252,7 +261,7 @@ $$
 \hat{B} = \frac{\sum_i w_i^* \cdot B_i}{\sum_i w_i^*}
 $$
 
-where w_i* incorporates both reputation and IoU agreement with other submissions.
+where w_i\* incorporates both reputation and IoU agreement with other submissions.
 
 **Span Labels (NER):**
 Overlapping spans are clustered, then weighted boundaries and entity types are computed within each cluster.
@@ -268,7 +277,7 @@ Responses are embedded and clustered by semantic similarity. The highest-reputat
 
 **Theorem 1 (Sybil Resistance).** Creating k identities provides no advantage over a single identity with equivalent stake.
 
-*Proof:* Vote weight is determined by reputation, not identity count. New identities begin at reputation 500 (Journeyman). Total voting weight of k new identities with stake S each equals k × (500/Σ R_j). A single identity with stake kS has reputation 500 and voting weight 500/Σ R_j. Since vote weight is independent of stake amount (only requiring S ≥ S_min), splitting stake across identities does not increase influence. □
+_Proof:_ Vote weight is determined by reputation, not identity count. New identities begin at reputation 500 (Journeyman). Total voting weight of k new identities with stake S each equals k × (500/Σ R_j). A single identity with stake kS has reputation 500 and voting weight 500/Σ R_j. Since vote weight is independent of stake amount (only requiring S ≥ S_min), splitting stake across identities does not increase influence. □
 
 **Corollary:** The attacker's optimal strategy is to concentrate stake in a single identity and build reputation through legitimate participation.
 
@@ -282,11 +291,12 @@ $$
 
 where T_rep is the time required to build sufficient reputation.
 
-*Proof sketch:* To control consensus on a task, attackers need majority weighted vote. With threshold θ = 0.70 and N = 3 labelers, attackers need at least 2 high-reputation labelers per task. Each requires minimum stake S_min and time to build reputation. □
+_Proof sketch:_ To control consensus on a task, attackers need majority weighted vote. With threshold θ = 0.70 and N = 3 labelers, attackers need at least 2 high-reputation labelers per task. Each requires minimum stake S_min and time to build reputation. □
 
 **Detection Mechanisms:**
 
 Collusion is detected through:
+
 1. **Statistical correlation**: Unusual agreement patterns between labeler pairs
 2. **Timing analysis**: Synchronized submission times
 3. **Behavioral clustering**: Similar error patterns across tasks
@@ -297,11 +307,11 @@ Detected colluders face coordinated slashing (50-100% of stake).
 
 **Theorem 3 (BFT Guarantee).** Under honest majority assumption, RWCP produces correct labels with probability ≥ 1 − ε for arbitrarily small ε.
 
-*Proof:* Let R_H = Σ_{ℓ ∈ H} R_ℓ be total honest reputation and R_C = Σ_{ℓ ∈ C} R_ℓ be adversarial reputation. By assumption, R_H > R_C.
+_Proof:_ Let R*H = Σ\{ℓ ∈ H\} R*ℓ be total honest reputation and R*C = Σ\{ℓ ∈ C\} R*ℓ be adversarial reputation. By assumption, R_H &gt; R_C.
 
-In weighted voting, honest labelers contribute weight R_H/(R_H + R_C) > 0.5. With consensus threshold θ ≥ 0.5, honest majority is sufficient to determine consensus.
+In weighted voting, honest labelers contribute weight R_H/(R_H + R_C) &gt; 0.5. With consensus threshold θ ≥ 0.5, honest majority is sufficient to determine consensus.
 
-For θ = 0.70 and honest labelers agreeing on correct label L*, we have W(L*) ≥ R_H/(R_H + R_C) > 0.5. If honest labelers coordinate (which they do on correct labels), W(L*) approaches R_H/(R_H + R_C).
+For θ = 0.70 and honest labelers agreeing on correct label L, we have W(L) ≥ R_H/(R_H + R_C) &gt; 0.5. If honest labelers coordinate (which they do on correct labels), W(L) approaches R_H/(R_H + R_C).
 
 As honest majority strengthens, P(consensus = correct) → 1. □
 
@@ -320,6 +330,7 @@ $$
 $$
 
 With current parameters:
+
 - S_min = 1,000 ELASTIC
 - P(detection) ≈ 0.70
 - Slash rate σ = 0.50 to 1.00
@@ -341,12 +352,12 @@ Slashing serves two functions:
 
 ### 6.2 Slashing Conditions
 
-| Violation | Evidence Required | Slash Rate |
-|-----------|-------------------|------------|
-| Sybil Attack | Wallet clustering, behavioral fingerprint | 100% |
-| Collusion | Statistical correlation ≥ 3σ | 50–100% |
-| Spam/Random | Entropy below threshold | 25% |
-| Persistent Low Quality | A < 0.30 over 50+ tasks | 10% |
+| Violation              | Evidence Required                         | Slash Rate |
+| ---------------------- | ----------------------------------------- | ---------- |
+| Sybil Attack           | Wallet clustering, behavioral fingerprint | 100%       |
+| Collusion              | Statistical correlation ≥ 3σ              | 50–100%    |
+| Spam/Random            | Entropy below threshold                   | 25%        |
+| Persistent Low Quality | A < 0.30 over 50+ tasks                   | 10%        |
 
 ### 6.3 Slashing Economics
 
@@ -357,6 +368,7 @@ $$
 $$
 
 Distribution of slashed tokens:
+
 - **50%** → Protocol treasury (insurance fund)
 - **50%** → Burned (deflationary pressure)
 
@@ -371,16 +383,19 @@ The burn component creates positive externality for all token holders, aligning 
 When consensus fails or is challenged, disputes are escalated:
 
 **Level 1: Additional Labelers**
+
 - Condition: 0.5 ≤ W(L̂) < θ
 - Action: Assign N additional labelers
 - Cost: Provider's escrow
 
 **Level 2: Expert Panel**
+
 - Condition: Dispute filed with 100 ELASTIC stake
 - Action: 5 Grandmaster labelers review
 - Resolution: 4/5 supermajority required
 
 **Level 3: DAO Governance**
+
 - Condition: Panel split or appeal filed
 - Action: Token holder vote
 - Resolution: Simple majority
@@ -423,6 +438,7 @@ Honeypots are indistinguishable from regular tasks, forcing consistent effort.
 ### 8.3 Behavioral Analysis
 
 The protocol monitors for anomalous patterns:
+
 - Submission timing (too fast suggests random guessing)
 - Error correlation (similar mistakes suggest collusion)
 - Label distribution (deviation from expected frequencies)
@@ -433,19 +449,94 @@ Flagged behavior triggers additional scrutiny and potential investigation.
 
 ## 9. Protocol Parameters
 
-| Parameter | Symbol | Default | Governance |
-|-----------|--------|---------|------------|
-| Labelers per task | N | 3 | DAO vote |
-| Consensus threshold | θ | 0.70 | DAO vote |
-| Minimum stake | S_min | 1,000 ELASTIC | DAO vote |
-| Accuracy weight | α | 0.60 | Fixed |
-| Honeypot rate | — | 5% | Protocol |
-| Dispute stake | — | 100 ELASTIC | DAO vote |
-| Decay start | — | 7 days | Fixed |
+| Parameter           | Symbol | Default       | Governance |
+| ------------------- | ------ | ------------- | ---------- |
+| Labelers per task   | N      | 3             | DAO vote   |
+| Consensus threshold | θ      | 0.70          | DAO vote   |
+| Minimum stake       | S_min  | 1,000 ELASTIC | DAO vote   |
+| Accuracy weight     | α      | 0.60          | Fixed      |
+| Honeypot rate       | —      | 5%            | Protocol   |
+| Dispute stake       | —      | 100 ELASTIC   | DAO vote   |
+| Decay start         | —      | 7 days        | Fixed      |
 
 ---
 
-## 10. Conclusion
+## 10. On-Chain Attestation via EAS
+
+Upon consensus finalization, Elastic Studio creates an attestation using [Ethereum Attestation Service (EAS)](https://attest.org/). This provides cryptographic proof of the consensus result that agents and applications can independently verify.
+
+### 10.1 Attestation Process
+
+```mermaid
+sequenceDiagram
+    participant V as Consensus Validator
+    participant A as Attester Contract
+    participant EAS as EAS Contract
+    participant I as Vector Index
+
+    V->>V: Compute final label L̂
+    V->>V: Calculate consensus score W(L̂)
+    V->>A: Request attestation
+    A->>A: Construct merkle tree of submissions
+    A->>EAS: attest(schema, data)
+    EAS-->>A: Return attestation UID
+    A-->>V: Attestation UID
+    V->>I: Index record with UID
+```
+
+### 10.2 Attestation Data
+
+Each label consensus creates an EAS attestation containing:
+
+| Field            | Value                        | Purpose                  |
+| ---------------- | ---------------------------- | ------------------------ |
+| `recordId`       | hash(dataset_id, item_index) | Unique identifier        |
+| `labelHash`      | keccak256(label_json)        | Label integrity          |
+| `consensusScore` | W(L̂) × 10000                 | Quality signal (0-10000) |
+| `labelerCount`   | N                            | Number of verifiers      |
+| `merkleRoot`     | root(submissions)            | Verify individual labels |
+| `timestamp`      | block.timestamp              | Temporal proof           |
+
+### 10.3 Verification by Agents
+
+Agents can verify attestations independently:
+
+```python
+from eas_sdk import EAS
+
+# Initialize EAS client
+eas = EAS(provider, EAS_CONTRACT_ADDRESS)
+
+# Verify attestation from Elastic Studio response
+attestation = eas.get_attestation(attestation_uid)
+
+# Check validity
+if attestation.revoked:
+    raise Error("Attestation revoked")
+
+# Decode data
+data = eas.decode(attestation.data, LABEL_SCHEMA)
+print(f"Consensus: {data['consensusScore'] / 100}%")
+print(f"Labelers: {data['labelerCount']}")
+
+# Verify label integrity
+if keccak256(label_json) != data['labelHash']:
+    raise Error("Label tampered")
+```
+
+### 10.4 Benefits of EAS Integration
+
+| Benefit             | Description                                        |
+| ------------------- | -------------------------------------------------- |
+| **Standardization** | 8.7M+ attestations in ecosystem, recognized format |
+| **Composability**   | Attestations work with other Ethereum protocols    |
+| **Immutability**    | On-chain record cannot be altered                  |
+| **Agent-Native**    | EAS explicitly supports agent interactions         |
+| **Cost Efficiency** | Off-chain attestations with on-chain anchoring     |
+
+---
+
+## 11. Conclusion
 
 The Reputation-Weighted Consensus Protocol provides a rigorous foundation for decentralized data labeling. By combining cryptoeconomic incentives with meritocratic influence, RWCP achieves quality assurance as an equilibrium property rather than an enforcement problem.
 

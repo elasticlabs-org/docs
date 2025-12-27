@@ -38,9 +38,17 @@
             "pages": ["elastic-studio/tokenomics"]
           },
           {
-            "group": "Security & Governance",
+            "group": "Agent Applications",
+            "pages": [
+              "elastic-studio/agent-use-cases",
+              "elastic-studio/agent-integrations"
+            ]
+          },
+          {
+            "group": "Security & Privacy",
             "pages": [
               "elastic-studio/security-analysis",
+              "elastic-studio/zk-access",
               "elastic-studio/governance"
             ]
           },
@@ -49,54 +57,6 @@
             "pages": [
               "elastic-studio/access-layer",
               "elastic-studio/specifications"
-            ]
-          }
-        ]
-      },
-      {
-        "tab": "Guides",
-        "groups": [
-          {
-            "group": "Getting started",
-            "pages": ["index", "quickstart", "development"]
-          },
-          {
-            "group": "Customization",
-            "pages": ["essentials/settings", "essentials/navigation"]
-          },
-          {
-            "group": "Writing content",
-            "pages": [
-              "essentials/markdown",
-              "essentials/code",
-              "essentials/images",
-              "essentials/reusable-snippets"
-            ]
-          },
-          {
-            "group": "AI tools",
-            "pages": [
-              "ai-tools/cursor",
-              "ai-tools/claude-code",
-              "ai-tools/windsurf"
-            ]
-          }
-        ]
-      },
-      {
-        "tab": "API reference",
-        "groups": [
-          {
-            "group": "API documentation",
-            "pages": ["api-reference/introduction"]
-          },
-          {
-            "group": "Endpoint examples",
-            "pages": [
-              "api-reference/endpoint/get",
-              "api-reference/endpoint/create",
-              "api-reference/endpoint/delete",
-              "api-reference/endpoint/webhook"
             ]
           }
         ]
